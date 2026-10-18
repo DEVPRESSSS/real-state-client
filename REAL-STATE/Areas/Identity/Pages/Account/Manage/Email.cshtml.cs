@@ -11,9 +11,10 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using REAL-STATE.Data;
+using REAL_STATE.Data;
+using REAL_STATE.Models;
 
-namespace REAL-STATE.Areas.Identity.Pages.Account.Manage;
+namespace REAL_STATE.Areas.Identity.Pages.Account.Manage;
 
 public class EmailModel : PageModel
 {

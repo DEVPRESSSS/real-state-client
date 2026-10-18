@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using REAL-STATE.Data;
+using REAL_STATE.Data;
+using REAL_STATE.Models;
 
-namespace REAL-STATE.Areas.Identity.Pages.Account;
+namespace REAL_STATE.Areas.Identity.Pages.Account;
 
 public class LoginWith2faModel : PageModel
 {
