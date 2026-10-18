@@ -1,43 +1,48 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+}
+
+:root {
+    --bs-body-font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 body {
     margin-bottom: 60px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--bs-body-font-family);
+    font-size: 0.95rem; 
     color: #1F2937;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
 }
 
-h1, h2, h3,
-.property-heading,
-.brand-heading {
-    font-family: 'Playfair Display', serif;
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
+/* Form controls and navbar inherit the site font */
 button,
 input,
 select,
@@ -45,5 +50,11 @@ textarea,
 .navbar,
 .form-control,
 .form-select {
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
+}
+
+/* Keep digits aligned so prices are easy to compare */
+.price {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
 }

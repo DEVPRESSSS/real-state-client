@@ -373,6 +373,8 @@ namespace REAL_STATE.Data
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+
+            DbSeeder.Seed(modelBuilder);
         }
     }
 }

@@ -213,6 +213,26 @@ namespace REAL_STATE.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Agents", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "a0000000-0000-0000-0000-000000000001",
+                            Email = "agent1@example.com",
+                            FullName = "Jerald Montemor",
+                            IsActive = true,
+                            Phone = "+63 900 000 0001",
+                            Role = "Agent"
+                        },
+                        new
+                        {
+                            Id = "a0000000-0000-0000-0000-000000000002",
+                            Email = "broker1@example.com",
+                            FullName = "Clive",
+                            IsActive = true,
+                            Phone = "+63 900 000 0002",
+                            Role = "Broker"
+                        });
                 });
 
             modelBuilder.Entity("REAL_STATE.Models.ApplicationUser", b =>
@@ -367,6 +387,26 @@ namespace REAL_STATE.Migrations
                         .IsUnique();
 
                     b.ToTable("Developers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "d0000000-0000-0000-0000-000000000001",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Sample developer for development use.",
+                            IsActive = true,
+                            Name = "Sample Developer One",
+                            Slug = "sample-developer-one"
+                        },
+                        new
+                        {
+                            Id = "d0000000-0000-0000-0000-000000000002",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Sample developer for development use.",
+                            IsActive = true,
+                            Name = "Sample Developer Two",
+                            Slug = "sample-developer-two"
+                        });
                 });
 
             modelBuilder.Entity("REAL_STATE.Models.Inquiry", b =>
@@ -540,6 +580,87 @@ namespace REAL_STATE.Migrations
                     b.HasIndex("ListingType", "Status");
 
                     b.ToTable("Properties", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "p0000000-0000-0000-0000-000000000001",
+                            Address = "Sample Street",
+                            AgentId = "a0000000-0000-0000-0000-000000000001",
+                            Bathrooms = 1,
+                            Bedrooms = 2,
+                            City = "Quezon City",
+                            Country = "Philippines",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Sample listing for development.",
+                            DeveloperId = "d0000000-0000-0000-0000-000000000001",
+                            FloorAreaSqFt = 645m,
+                            IsFeatured = true,
+                            ListingType = "Sale",
+                            Price = 6500000m,
+                            PropertyType = "Condo",
+                            Province = "Metro Manila",
+                            Slug = "sample-2br-condo-quezon-city",
+                            Status = "Available",
+                            Title = "Sample 2BR Condo in Quezon City"
+                        },
+                        new
+                        {
+                            Id = "p0000000-0000-0000-0000-000000000002",
+                            AgentId = "a0000000-0000-0000-0000-000000000001",
+                            Bathrooms = 1,
+                            Bedrooms = 1,
+                            City = "Makati",
+                            Country = "Philippines",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DeveloperId = "d0000000-0000-0000-0000-000000000001",
+                            FloorAreaSqFt = 258m,
+                            IsFeatured = false,
+                            ListingType = "Rent",
+                            Price = 28000m,
+                            PropertyType = "Condo",
+                            Province = "Metro Manila",
+                            Slug = "sample-studio-rent-makati",
+                            Status = "Available",
+                            Title = "Sample Studio for Rent in Makati"
+                        },
+                        new
+                        {
+                            Id = "p0000000-0000-0000-0000-000000000003",
+                            AgentId = "a0000000-0000-0000-0000-000000000002",
+                            Bathrooms = 3,
+                            Bedrooms = 4,
+                            City = "Imus",
+                            Country = "Philippines",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DeveloperId = "d0000000-0000-0000-0000-000000000002",
+                            FloorAreaSqFt = 1722m,
+                            IsFeatured = true,
+                            ListingType = "Sale",
+                            Price = 8900000m,
+                            PropertyType = "House",
+                            Province = "Cavite",
+                            Slug = "sample-house-lot-cavite",
+                            Status = "Available",
+                            Title = "Sample House and Lot in Cavite"
+                        },
+                        new
+                        {
+                            Id = "p0000000-0000-0000-0000-000000000004",
+                            City = "Santa Rosa",
+                            Country = "Philippines",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DeveloperId = "d0000000-0000-0000-0000-000000000002",
+                            FloorAreaSqFt = 1614m,
+                            IsFeatured = false,
+                            ListingType = "Sale",
+                            Price = 3200000m,
+                            PropertyType = "Lot",
+                            Province = "Laguna",
+                            Slug = "sample-lot-laguna",
+                            Status = "Available",
+                            Title = "Sample Lot in Laguna"
+                        });
                 });
 
             modelBuilder.Entity("REAL_STATE.Models.PropertyImage", b =>
@@ -580,6 +701,44 @@ namespace REAL_STATE.Migrations
                     b.HasIndex("PropertyId", "DisplayOrder");
 
                     b.ToTable("PropertyImages", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "i0000000-0000-0000-0000-000000000001",
+                            AltText = "Sample condo",
+                            DisplayOrder = 1,
+                            ImageUrl = "/images/properties/placeholder-1.jpg",
+                            IsPrimary = true,
+                            PropertyId = "p0000000-0000-0000-0000-000000000001"
+                        },
+                        new
+                        {
+                            Id = "i0000000-0000-0000-0000-000000000002",
+                            AltText = "Sample studio",
+                            DisplayOrder = 1,
+                            ImageUrl = "/images/properties/placeholder-2.jpg",
+                            IsPrimary = true,
+                            PropertyId = "p0000000-0000-0000-0000-000000000002"
+                        },
+                        new
+                        {
+                            Id = "i0000000-0000-0000-0000-000000000003",
+                            AltText = "Sample house",
+                            DisplayOrder = 1,
+                            ImageUrl = "/images/properties/placeholder-3.jpg",
+                            IsPrimary = true,
+                            PropertyId = "p0000000-0000-0000-0000-000000000003"
+                        },
+                        new
+                        {
+                            Id = "i0000000-0000-0000-0000-000000000004",
+                            AltText = "Sample lot",
+                            DisplayOrder = 1,
+                            ImageUrl = "/images/properties/placeholder-4.jpg",
+                            IsPrimary = true,
+                            PropertyId = "p0000000-0000-0000-0000-000000000004"
+                        });
                 });
 
             modelBuilder.Entity("REAL_STATE.Models.Referral", b =>

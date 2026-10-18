@@ -16,11 +16,11 @@
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
           rel="stylesheet">
 
 </head>
-<body class="bg-light">
+<body class="bg-white">
 
     <header>
         <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-3">
@@ -69,24 +69,16 @@
 
                     <ul class="navbar-nav mx-auto gap-lg-2 my-3 my-lg-0">
 
+
                         <li class="nav-item">
                             <a class="nav-link fw-semibold text-success"
                                asp-controller="Properties"
                                asp-action="Index"
-                               asp-route-listingType="Sale">
-                                Buy
+                                >
+                                Properties
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="Properties"
-                               asp-action="Index"
-                               asp-route-listingType="Rent">
-                                Rent
-                            </a>
-                        </li>
-
+                        
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="Developers"
