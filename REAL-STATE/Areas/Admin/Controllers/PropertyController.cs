@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using REAL_STATE.Data;
 using REAL_STATE.Models.DTO.PropertyDTO;
-using REAL_STATE.Repository.Interfaces;
+using REAL_STATE.Services.Interfaces;
 
 namespace REAL_STATE.Areas.Admin.Controllers
 {
