@@ -42,7 +42,6 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.01em;
 }
 
-/* Form controls and navbar inherit the site font */
 button,
 input,
 select,
@@ -53,7 +52,6 @@ textarea,
     font-family: inherit;
 }
 
-/* Keep digits aligned so prices are easy to compare */
 .price {
     font-variant-numeric: tabular-nums;
     font-weight: 700;

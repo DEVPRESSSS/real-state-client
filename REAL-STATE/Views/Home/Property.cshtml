@@ -1,0 +1,97 @@
+﻿@using REAL_STATE.Models.DTO.PropertyDTO.REAL_STATE.DTOs
+@model IEnumerable<FilterPropertyDTO>
+@{
+    var listingType = Context.Request.Query["listingType"].ToString();
+    var isRent = string.Equals(listingType, "Rent", StringComparison.OrdinalIgnoreCase);
+    ViewData["Title"] = isRent ? "Properties for rent" : "Properties for sale";
+
+    string Q(string key) => Context.Request.Query[key].ToString();
+    var hasFilters = new[] { "city", "propertyType", "minPrice", "maxPrice", "minFloorArea" }
+        .Any(k => !string.IsNullOrWhiteSpace(Q(k)));
+}
+
+<div class="container py-4 py-lg-5">
+
+    <div class="mb-4">
+        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">@ViewData["Title"]</h1>
+        <p class="text-secondary mb-0">Browse listings from developers, agents and brokers.</p>
+    </div>
+
+    <div class="d-lg-none mb-3">
+        <button class="btn btn-outline-success w-100" type="button"
+                data-bs-toggle="collapse" data-bs-target="#filterPanel"
+                aria-expanded="@(hasFilters ? "true" : "false")" aria-controls="filterPanel">
+            Search and filter
+        </button>
+    </div>
+
+    <div class="collapse d-lg-block @(hasFilters ? "show" : "")" id="filterPanel">
+        <form method="get" asp-controller="Home" asp-action="Index"
+              class="card border shadow-sm mb-4">
+            <div class="card-body">
+                <input type="hidden" name="listingType" value="@(isRent ? "Rent" : "Sale")" />
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label for="city" class="form-label">Location</label>
+                        <input id="city" name="city" type="text" class="form-control"
+                               placeholder="City" value="@Q("city")" />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label for="propertyType" class="form-label">Property type</label>
+                        <input id="propertyType" name="propertyType" type="text" class="form-control"
+                               placeholder="e.g. Condominium" value="@Q("propertyType")" />
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label for="minPrice" class="form-label">Min price (₱)</label>
+                        <input id="minPrice" name="minPrice" type="number" min="0" step="any"
+                               class="form-control" value="@Q("minPrice")" />
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label for="maxPrice" class="form-label">Max price (₱)</label>
+                        <input id="maxPrice" name="maxPrice" type="number" min="0" step="any"
+                               class="form-control" value="@Q("maxPrice")" />
+                    </div>
+                    <div class="col-12 col-lg-2">
+                        <label for="minFloorArea" class="form-label">Min floor area (sq ft)</label>
+                        <input id="minFloorArea" name="minFloorArea" type="number" min="0" step="any"
+                               class="form-control" value="@Q("minFloorArea")" />
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-success px-4">Search properties</button>
+                    @if (hasFilters)
+                    {
+                        <a asp-controller="Properties" asp-action="Index"
+                           asp-route-listingType="@(isRent ? "Rent" : "Sale")"
+                           class="btn btn-outline-secondary">Reset filters</a>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <p class="text-secondary small mb-3" aria-live="polite">
+            Showing @Model.Count() @(Model.Count() == 1 ? "property" : "properties")
+        </p>
+
+        <div class="row g-4">
+            @foreach (var property in Model)
+            {
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <partial name="_PropertyCard" model="property" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center bg-white border rounded p-5">
+            <h2 class="h5">No properties found</h2>
+            <p class="text-secondary mb-0">Try changing your location, price range, or property type.</p>
+        </div>
+    }
+</div>

@@ -1,7 +1,9 @@
-﻿@model IEnumerable<Property>
+﻿@using REAL_STATE.Models.DTO.PropertyDTO.REAL_STATE.DTOs
+@model IEnumerable<FilterPropertyDTO>
 @{
     var listingType = Context.Request.Query["listingType"].ToString();
     var isRent = string.Equals(listingType, "Rent", StringComparison.OrdinalIgnoreCase);
+
     ViewData["Title"] = isRent ? "Properties for rent" : "Properties for sale";
 
     string Q(string key) => Context.Request.Query[key].ToString();
@@ -26,7 +28,7 @@
     </div>
 
     <div class="collapse d-lg-block @(hasFilters ? "show" : "")" id="filterPanel">
-        <form method="get" asp-controller="Properties" asp-action="Index"
+        <form method="get" asp-controller="Home" asp-action="Index"
               class="card border shadow-sm mb-4">
             <div class="card-body">
                 <input type="hidden" name="listingType" value="@(isRent ? "Rent" : "Sale")" />

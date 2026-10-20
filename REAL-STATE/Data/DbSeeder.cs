@@ -7,7 +7,6 @@ namespace REAL_STATE.Data
     {
         private static readonly DateTime SeedDate = new(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        // Fixed IDs
         private const string Dev1 = "d0000000-0000-0000-0000-000000000001";
         private const string Dev2 = "d0000000-0000-0000-0000-000000000002";
         private const string Agent1 = "a0000000-0000-0000-0000-000000000001";
@@ -39,7 +38,6 @@ namespace REAL_STATE.Data
                     CreatedAt = SeedDate
                 });
 
-            // UserId left null: agents are not linked to Identity accounts in seed data
             b.Entity<Agent>().HasData(
                 new Agent
                 {
@@ -141,7 +139,6 @@ namespace REAL_STATE.Data
                     CreatedAt = SeedDate
                 });
 
-            // Placeholder paths only: replace with real files under wwwroot
             b.Entity<PropertyImage>().HasData(
                 new PropertyImage { Id = "i0000000-0000-0000-0000-000000000001", PropertyId = Prop1, ImageUrl = "/images/properties/placeholder-1.jpg", AltText = "Sample condo", DisplayOrder = 1, IsPrimary = true },
                 new PropertyImage { Id = "i0000000-0000-0000-0000-000000000002", PropertyId = Prop2, ImageUrl = "/images/properties/placeholder-2.jpg", AltText = "Sample studio", DisplayOrder = 1, IsPrimary = true },

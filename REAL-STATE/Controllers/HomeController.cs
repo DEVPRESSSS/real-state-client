@@ -1,19 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using REAL_STATE.Models;
+using REAL_STATE.Models.DTO.PropertyDTO;
+using REAL_STATE.Services.Interfaces;
 using System.Diagnostics;
 
 namespace REAL_STATE.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IPropertyService _propertyService;
+        public HomeController(IPropertyService propertyService)
         {
-            return View();
+            _propertyService = propertyService;
         }
-
-        public IActionResult Privacy()
+    
+        public async Task<IActionResult> Index([FromQuery] CriteriaDTO criteria)
         {
-            return View();
+            var properties = await _propertyService.Filter(criteria);
+            return View(properties);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

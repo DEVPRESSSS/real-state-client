@@ -1,0 +1,80 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var listingType = Context.Request.Query["listingType"].ToString();
+
+    bool isBuy = controller == "Properties" && !string.Equals(listingType, "Rent", StringComparison.OrdinalIgnoreCase);
+    bool isRent = controller == "Properties" && string.Equals(listingType, "Rent", StringComparison.OrdinalIgnoreCase);
+    bool isDevelopers = controller == "Developers";
+    bool isAgents = controller == "Agents";
+    bool isSaved = controller == "Bookmarks";
+
+    string Active(bool on) => on ? "active" : "";
+    string Current(bool on) => on ? "page" : null!;
+}
+
+<aside id="appSidebar" class="app-sidebar" aria-label="Sidebar">
+
+    <p class="sidebar-heading">Browse</p>
+
+    <a class="sidebar-link @Active(isBuy)" title="Buy" aria-current="@Current(isBuy)"
+       asp-controller="Properties" asp-action="Index" asp-route-listingType="Sale">
+        <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7M5 9v11h14V9M9 20v-7h6v7" />
+        </svg>
+        <span class="sidebar-label">Buy</span>
+    </a>
+
+    <a class="sidebar-link @Active(isRent)" title="Rent" aria-current="@Current(isRent)"
+       asp-controller="Properties" asp-action="Index" asp-route-listingType="Rent">
+        <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 2-2 2m-7.6 7.6a5.5 5.5 0 1 1-7.8 7.8 5.5 5.5 0 0 1 7.8-7.8Zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4" />
+        </svg>
+        <span class="sidebar-label">Rent</span>
+    </a>
+
+    <a class="sidebar-link @Active(isDevelopers)" title="Developers" aria-current="@Current(isDevelopers)"
+       asp-controller="Developers" asp-action="Index">
+        <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M19 21V10h-4M9 7h2M9 11h2M9 15h2" />
+        </svg>
+        <span class="sidebar-label">Developers</span>
+    </a>
+
+    <a class="sidebar-link @Active(isAgents)" title="Agents &amp; Brokers" aria-current="@Current(isAgents)"
+       asp-controller="Agents" asp-action="Index">
+        <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" />
+        </svg>
+        <span class="sidebar-label">Agents &amp; Brokers</span>
+    </a>
+
+    <hr class="sidebar-divider" />
+
+    <p class="sidebar-heading">My Account</p>
+
+    <a class="sidebar-link @Active(isSaved)" title="Saved" aria-current="@Current(isSaved)"
+       asp-controller="Bookmarks" asp-action="Index">
+        <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+        </svg>
+        <span class="sidebar-label">Saved</span>
+    </a>
+
+    <a class="sidebar-link" title="Sign In" asp-area="Identity" asp-page="/Account/Login">
+        <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+        </svg>
+        <span class="sidebar-label">Sign In</span>
+    </a>
+
+    <div class="sidebar-cta">
+        <a class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2"
+           title="List a Property" asp-controller="Home" asp-action="Contact">
+            <svg class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
+            </svg>
+            <span class="sidebar-label">List a Property</span>
+        </a>
+    </div>
+</aside>
+       
