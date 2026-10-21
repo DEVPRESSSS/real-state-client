@@ -2,6 +2,8 @@
 using REAL_STATE.Data;
 using REAL_STATE.Models.DTO.PropertyDTO;
 using REAL_STATE.Models.DTO.PropertyDTO.REAL_STATE.DTOs;
+using REAL_STATE.Models.VM;
+using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services.Interfaces;
 
 namespace REAL_STATE.Services
@@ -9,9 +11,22 @@ namespace REAL_STATE.Services
     public class PropertyService:IPropertyService
     {
         private readonly ApplicationDbContext _context;
-        public PropertyService(ApplicationDbContext context)
+        private readonly IPropertyRepository _propertyRepository;
+
+        public PropertyService(
+            ApplicationDbContext context,
+            IPropertyRepository propertyRepository
+
+            )
         {
             _context = context;
+            _propertyRepository = propertyRepository;
+        }
+
+        public async Task AddProperty(PropertyVM vm)
+        {
+            await _propertyRepository.AddAsync(vm.Property);
+            await _propertyRepository.Save();
         }
 
         public async Task<List<FilterPropertyDTO>> Filter(CriteriaDTO? criteriaDTO)

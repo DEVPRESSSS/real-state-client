@@ -56,3 +56,9 @@ textarea,
     font-variant-numeric: tabular-nums;
     font-weight: 700;
 }
+@media (min-width: 992px) {
+    .admin-sidebar {
+        flex: 0 0 240px;
+        width: 240px;
+    }
+}

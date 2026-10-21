@@ -1,19 +1,17 @@
 ﻿@using REAL_STATE.Models
-@model Property
-@{
-    ViewData["Title"] = "List a property";
-}
+@using REAL_STATE.Models.VM
+@model PropertyVM
+
 
 <div class="container py-4 py-lg-5">
-
     <div class="mb-4">
         <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">List a property</h1>
         <p class="text-secondary mb-0">Fields marked <span class="text-danger">*</span> are required.</p>
     </div>
 
-    <form asp-controller="Properties" asp-action="Create" method="post" novalidate>
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
+    <form asp-area="Admin" asp-controller="Property" asp-action="Upsert" method="post" novalidate>
+        <input type="hidden" asp-for="Property.Id" />
+        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
         <div class="row g-4">
             <div class="col-12 col-lg-8">
 
@@ -23,41 +21,41 @@
                         <h2 id="basic-heading" class="h5 mb-3">Basic information</h2>
                         <div class="row g-3">
                             <div class="col-12">
-                                <label asp-for="Title" class="form-label">Title <span class="text-danger">*</span></label>
-                                <input asp-for="Title" class="form-control" maxlength="200"
+                                <label asp-for="Property.Title" class="form-label">Title <span class="text-danger">*</span></label>
+                                <input asp-for="Property.Title" class="form-control" maxlength="200"
                                        placeholder="e.g. 2-bedroom condominium near BGC" />
-                                <span asp-validation-for="Title" class="text-danger small"></span>
+                                <span asp-validation-for="Property.Title" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12">
-                                <label asp-for="Slug" class="form-label">URL slug <span class="text-danger">*</span></label>
-                                <input asp-for="Slug" class="form-control" maxlength="250"
+                                <label asp-for="Property.Slug" class="form-label">URL slug <span class="text-danger">*</span></label>
+                                <input asp-for="Property.Slug" class="form-control" maxlength="250"
                                        placeholder="2-bedroom-condominium-near-bgc"
                                        aria-describedby="slugHelp" />
                                 <div id="slugHelp" class="form-text">Must be unique. Use lowercase letters, numbers and hyphens.</div>
-                                <span asp-validation-for="Slug" class="text-danger small"></span>
+                                <span asp-validation-for="Property.Slug" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label asp-for="PropertyType" class="form-label">Property type <span class="text-danger">*</span></label>
-                                <input asp-for="PropertyType" class="form-control" maxlength="50"
+                                <label asp-for="Property.PropertyType" class="form-label">Property type <span class="text-danger">*</span></label>
+                                <input asp-for="Property.PropertyType" class="form-control" maxlength="50"
                                        placeholder="e.g. Condominium" />
-                                <span asp-validation-for="PropertyType" class="text-danger small"></span>
+                                <span asp-validation-for="Property.PropertyType" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label asp-for="ListingType" class="form-label">Listing type <span class="text-danger">*</span></label>
-                                <select asp-for="ListingType" class="form-select">
+                                <label asp-for="Property.ListingType" class="form-label">Listing type <span class="text-danger">*</span></label>
+                                <select asp-for="Property.ListingType" class="form-select">
                                     <option value="Sale">For sale</option>
                                     <option value="Rent">For rent</option>
                                 </select>
-                                <span asp-validation-for="ListingType" class="text-danger small"></span>
+                                <span asp-validation-for="Property.ListingType" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12">
-                                <label asp-for="Description" class="form-label">Description</label>
-                                <textarea asp-for="Description" class="form-control" rows="6" maxlength="8000"></textarea>
-                                <span asp-validation-for="Description" class="text-danger small"></span>
+                                <label asp-for="Property.Description" class="form-label">Description</label>
+                                <textarea asp-for="Property.Description" class="form-control" rows="6" maxlength="8000"></textarea>
+                                <span asp-validation-for="Property.Description" class="text-danger small"></span>
                             </div>
                         </div>
                     </div>
@@ -69,33 +67,33 @@
                         <h2 id="specs-heading" class="h5 mb-3">Price and specifications</h2>
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
-                                <label asp-for="Price" class="form-label">Price <span class="text-danger">*</span></label>
+                                <label asp-for="Property.Price" class="form-label">Price <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">₱</span>
-                                    <input asp-for="Price" type="number" min="0" step="any" class="form-control" />
+                                    <input asp-for="Property.Price" type="number" min="0" step="any" class="form-control" />
                                 </div>
-                                <span asp-validation-for="Price" class="text-danger small"></span>
+                                <span asp-validation-for="Property.Price" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label asp-for="FloorAreaSqFt" class="form-label">Floor area <span class="text-danger">*</span></label>
+                                <label asp-for="Property.FloorAreaSqFt" class="form-label">Floor area <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input asp-for="FloorAreaSqFt" type="number" min="0" step="any" class="form-control" />
+                                    <input asp-for="Property.FloorAreaSqFt" type="number" min="0" step="any" class="form-control" />
                                     <span class="input-group-text">sq ft</span>
                                 </div>
-                                <span asp-validation-for="FloorAreaSqFt" class="text-danger small"></span>
+                                <span asp-validation-for="Property.FloorAreaSqFt" class="text-danger small"></span>
                             </div>
 
                             <div class="col-6">
-                                <label asp-for="Bedrooms" class="form-label">Bedrooms</label>
-                                <input asp-for="Bedrooms" type="number" min="0" step="1" class="form-control" />
-                                <span asp-validation-for="Bedrooms" class="text-danger small"></span>
+                                <label asp-for="Property.Bedrooms" class="form-label">Bedrooms</label>
+                                <input asp-for="Property.Bedrooms" type="number" min="0" step="1" class="form-control" />
+                                <span asp-validation-for="Property.Bedrooms" class="text-danger small"></span>
                             </div>
 
                             <div class="col-6">
-                                <label asp-for="Bathrooms" class="form-label">Bathrooms</label>
-                                <input asp-for="Bathrooms" type="number" min="0" step="1" class="form-control" />
-                                <span asp-validation-for="Bathrooms" class="text-danger small"></span>
+                                <label asp-for="Property.Bathrooms" class="form-label">Bathrooms</label>
+                                <input asp-for="Property.Bathrooms" type="number" min="0" step="1" class="form-control" />
+                                <span asp-validation-for="Property.Bathrooms" class="text-danger small"></span>
                             </div>
                         </div>
                     </div>
@@ -107,27 +105,27 @@
                         <h2 id="location-heading" class="h5 mb-3">Location</h2>
                         <div class="row g-3">
                             <div class="col-12">
-                                <label asp-for="Address" class="form-label">Street address</label>
-                                <input asp-for="Address" class="form-control" maxlength="300" />
-                                <span asp-validation-for="Address" class="text-danger small"></span>
+                                <label asp-for="Property.Address" class="form-label">Street address</label>
+                                <input asp-for="Property.Address" class="form-control" maxlength="300" />
+                                <span asp-validation-for="Property.Address" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label asp-for="City" class="form-label">City <span class="text-danger">*</span></label>
-                                <input asp-for="City" class="form-control" maxlength="100" />
-                                <span asp-validation-for="City" class="text-danger small"></span>
+                                <label asp-for="Property.City" class="form-label">City <span class="text-danger">*</span></label>
+                                <input asp-for="Property.City" class="form-control" maxlength="100" />
+                                <span asp-validation-for="Property.City" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label asp-for="Province" class="form-label">Province</label>
-                                <input asp-for="Province" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Province" class="text-danger small"></span>
+                                <label asp-for="Property.Province" class="form-label">Province</label>
+                                <input asp-for="Property.Province" class="form-control" maxlength="100" />
+                                <span asp-validation-for="Property.Province" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label asp-for="Country" class="form-label">Country <span class="text-danger">*</span></label>
-                                <input asp-for="Country" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Country" class="text-danger small"></span>
+                                <label asp-for="Property.Country" class="form-label">Country <span class="text-danger">*</span></label>
+                                <input asp-for="Property.Country" class="form-control" maxlength="100" />
+                                <span asp-validation-for="Property.Country" class="text-danger small"></span>
                             </div>
                         </div>
                     </div>
@@ -141,32 +139,30 @@
                         <h2 id="assign-heading" class="h5 mb-3">Listing details</h2>
 
                         <div class="mb-3">
-                            <label asp-for="DeveloperId" class="form-label">Developer <span class="text-danger">*</span></label>
-                            <select asp-for="DeveloperId" asp-items="@(ViewBag.Developers as IEnumerable<SelectListItem>)"
-                                    class="form-select">
+                            <label asp-for="Property.DeveloperId" class="form-label">Developer <span class="text-danger">*</span></label>
+                            <select asp-for="Property.DeveloperId" asp-items="Model.Developers" class="form-select">
                                 <option value="">Select a developer</option>
                             </select>
-                            <span asp-validation-for="DeveloperId" class="text-danger small"></span>
+                            <span asp-validation-for="Property.DeveloperId" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="AgentId" class="form-label">Agent or broker</label>
-                            <select asp-for="AgentId" asp-items="@(ViewBag.Agents as IEnumerable<SelectListItem>)"
-                                    class="form-select">
-                                <option value="">No agent assigned</option>
+                            <label asp-for="Property.AgentId" class="form-label">Agent or broker</label>
+                            <select asp-for="Property.AgentId" asp-items="Model.Agents" class="form-select">
+                                <option value="">Select a developer</option>
                             </select>
-                            <span asp-validation-for="AgentId" class="text-danger small"></span>
+                            <span asp-validation-for="Property.AgentId" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <input asp-for="Status" class="form-control" maxlength="30" />
-                            <span asp-validation-for="Status" class="text-danger small"></span>
+                            <label asp-for="Property.Status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <input asp-for="Property.Status" class="form-control" maxlength="30" />
+                            <span asp-validation-for="Property.Status" class="text-danger small"></span>
                         </div>
 
                         <div class="form-check">
-                            <input asp-for="IsFeatured" class="form-check-input" />
-                            <label asp-for="IsFeatured" class="form-check-label">Featured listing</label>
+                            <input asp-for="Property.IsFeatured" class="form-check-input" />
+                            <label asp-for="Property.IsFeatured" class="form-check-label">Featured listing</label>
                         </div>
                     </div>
                 </section>

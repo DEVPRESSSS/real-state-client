@@ -24,6 +24,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 #region -- Register Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IDeveloperRepository, DeveloperRepository>();
+builder.Services.AddScoped<IAgentRepository, AgentRepository>();
 #endregion
 
 #region -- Register services

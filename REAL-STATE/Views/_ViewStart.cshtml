@@ -1,4 +1,13 @@
-﻿@* Views/_ViewStart.cshtml *@
+﻿@using REAL_STATE.Utilities
 @{
+    if (User.IsInRole(RoleSD.Admin))
+    {
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }

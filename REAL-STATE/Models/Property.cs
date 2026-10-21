@@ -24,7 +24,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
-        public Developers Developer { get; set; } = null!;
+        public Developers? Developer { get; set; } = null!;
         public Agent? Agent { get; set; }
         public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
         public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();

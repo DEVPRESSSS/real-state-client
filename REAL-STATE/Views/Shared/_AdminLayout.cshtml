@@ -8,37 +8,39 @@
 
     <script type="importmap"></script>
 
-    <!-- Restore sidebar state before first paint (prevents flicker) -->
-    <script>
-        try {
-        if (localStorage.getItem("sidebar-collapsed") === "1")
-        document.documentElement.classList.add("sidebar-collapsed");
-        } catch (e) { }
-    </script>
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/REAL_STATE.styles.css" asp-append-version="true" />
-
+    <!--Datatable-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" />
+   
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
           rel="stylesheet">
+    <!--Bootstrap Icons-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 </head>
 <body class="bg-light">
 
+    
     <header>
-        <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-3" aria-label="Main">
+        <nav class="navbar bg-white border-bottom sticky-top py-3" aria-label="Main">
             <div class="container-fluid px-3 px-lg-4">
 
                 <div class="d-flex align-items-center gap-2">
-                 
+
+                    <!-- Sidebar toggle (mobile only) -->
+                    <button class="btn btn-light border-0 d-lg-none" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#adminSidebar"
+                            aria-controls="adminSidebar" aria-label="Open admin menu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
                     <!-- Brand -->
                     <a class="navbar-brand d-flex align-items-center gap-2 fw-bold me-0"
-                       asp-controller="Home"
-                       asp-action="Index">
+                       asp-area="" asp-controller="Home" asp-action="Index">
 
                         <span class="d-inline-flex align-items-center justify-content-center
                             bg-success text-white rounded-3"
@@ -53,39 +55,61 @@
                             </svg>
                         </span>
 
-                        <span class="d-flex flex-column lh-sm text-start">
-                            <span class="text-success fs-5">Haven</span>
-                            <small class="text-secondary"
-                                   style="font-size: 10px; letter-spacing: 2px;">
-                                REAL ESTATE
-                            </small>
-                        </span>
                     </a>
-
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold text-success"
-                           asp-area="Admin"
-                           asp-controller="Property"
-                           asp-action="Upsert">
-                            Add property
-                        </a>
-                    </li>
                 </div>
 
-              
+                <!-- Sign out -->
+                <form method="post" class="mb-0"
+                      asp-area="Identity" asp-page="/Account/Logout"
+                      asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>
+                </form>
 
-             
-             
             </div>
         </nav>
     </header>
 
-    <div class="app-shell">
-        @* <partial name="_Sidebar" />
-        <div class="app-backdrop" id="sidebarBackdrop"></div> *@
+    <div class="d-flex">
+
+        <!-- Sidebar -->
+        <aside class="offcanvas-lg offcanvas-start bg-white border-end admin-sidebar"
+               tabindex="-1" id="adminSidebar" aria-labelledby="adminSidebarLabel">
+
+            <div class="offcanvas-header d-lg-none border-bottom">
+                <h2 class="offcanvas-title h6 mb-0" id="adminSidebarLabel">Admin menu</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                        data-bs-target="#adminSidebar" aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body flex-column p-3">
+                <nav aria-label="Admin">
+                    <ul class="nav flex-column gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link rounded "
+                               asp-area="Admin" asp-controller="Property" asp-action="Upsert">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link rounded text-dark"
+                               asp-area="Admin" asp-controller="Property" asp-action="Index">
+                                Property
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link rounded text-dark"
+                               asp-area="" asp-controller="Home" asp-action="Index">
+                                Agents
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </aside>
 
         <!-- Main Content -->
-        <main role="main" class="app-main">
+        <main role="main" class="flex-grow-1 p-3 p-lg-4 bg-white app-main" style="min-width: 0;">
             @RenderBody()
         </main>
     </div>
@@ -93,7 +117,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
