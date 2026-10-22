@@ -5,6 +5,7 @@ using REAL_STATE.Models.DTO.PropertyDTO.REAL_STATE.DTOs;
 using REAL_STATE.Models.VM;
 using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services.Interfaces;
+using REAL_STATE.Utilities;
 
 namespace REAL_STATE.Services
 {
@@ -28,7 +29,40 @@ namespace REAL_STATE.Services
             await _propertyRepository.AddAsync(vm.Property);
             await _propertyRepository.Save();
         }
+        public async Task UpdateProperty(PropertyVM vm)
+        {
+            var prop = await _propertyRepository.GetAsync(x => x.Id == vm.Property.Id);
+            if (prop is null)
+                throw new GlobalExceptionHandler("Property not found!!");
 
+            var input = vm.Property;
+
+            prop.DeveloperId = input.DeveloperId;
+            prop.AgentId = string.IsNullOrWhiteSpace(input.AgentId) ? null : input.AgentId;
+            prop.Title = input.Title;
+            prop.Slug = input.Slug;
+            prop.Description = input.Description;
+            prop.PropertyType = input.PropertyType;
+            prop.ListingType = input.ListingType;
+            prop.Price = input.Price;
+            prop.FloorAreaSqFt = input.FloorAreaSqFt;
+            prop.Bedrooms = input.Bedrooms;
+            prop.Bathrooms = input.Bathrooms;
+            prop.Address = input.Address;
+            prop.City = input.City;
+            prop.Province = input.Province;
+            prop.Country = input.Country;
+            prop.Status = input.Status;
+            prop.IsFeatured = input.IsFeatured;
+            prop.UpdatedAt = DateTime.UtcNow;
+
+            var slugTaken = (await _propertyRepository.GetAllAsync(x => x.Slug == input.Slug && x.Id != input.Id)).Any();
+            if (slugTaken)
+                throw new GlobalExceptionHandler("Slug is already in use.");
+
+            await _propertyRepository.UpdateAsync(prop);
+            await _propertyRepository.Save();
+        }
         public async Task<List<FilterPropertyDTO>> Filter(CriteriaDTO? criteriaDTO)
         {
             var query = _context.Properties

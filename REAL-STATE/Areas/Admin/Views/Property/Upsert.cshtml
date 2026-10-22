@@ -2,16 +2,18 @@
 @using REAL_STATE.Models.VM
 @model PropertyVM
 
-
 <div class="container py-4 py-lg-5">
     <div class="mb-4">
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">List a property</h1>
+        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">
+            @(Model.IsEdit ? "Edit property" : "List a property")
+        </h1>
         <p class="text-secondary mb-0">Fields marked <span class="text-danger">*</span> are required.</p>
     </div>
 
     <form asp-area="Admin" asp-controller="Property" asp-action="Upsert" method="post" novalidate>
         <input type="hidden" asp-for="Property.Id" />
-        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
         <div class="row g-4">
             <div class="col-12 col-lg-8">
 
@@ -132,7 +134,7 @@
                 </section>
             </div>
 
-            <!-- Sidebar: assignment and status -->
+            <!-- Sidebar -->
             <div class="col-12 col-lg-4">
                 <section class="card border shadow-sm mb-4" aria-labelledby="assign-heading">
                     <div class="card-body">
@@ -149,7 +151,7 @@
                         <div class="mb-3">
                             <label asp-for="Property.AgentId" class="form-label">Agent or broker</label>
                             <select asp-for="Property.AgentId" asp-items="Model.Agents" class="form-select">
-                                <option value="">Select a developer</option>
+                                <option value="">No agent assigned</option>
                             </select>
                             <span asp-validation-for="Property.AgentId" class="text-danger small"></span>
                         </div>
@@ -168,8 +170,10 @@
                 </section>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success">Save property</button>
-                    <a asp-controller="Properties" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-lg me-1"></i>Save property
+                    </button>
+                    <a asp-area="Admin" asp-controller="Property" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
                 </div>
             </div>
         </div>

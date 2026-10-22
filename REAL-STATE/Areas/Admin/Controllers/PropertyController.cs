@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using REAL_STATE.Data;
-using REAL_STATE.Models.DTO.PropertyDTO;
+using REAL_STATE.Models;
 using REAL_STATE.Models.VM;
 using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services.Interfaces;
@@ -19,8 +17,9 @@ namespace REAL_STATE.Areas.Admin.Controllers
         private readonly IDeveloperRepository _developerRepository;
         private readonly IAgentRepository _agentRepository;
         private readonly IPropertyService _propertyService;
+
         public PropertyController(
-            IPropertyRepository propertyRepository, 
+            IPropertyRepository propertyRepository,
             IDeveloperRepository developerRepository,
             IAgentRepository agentRepository,
             IPropertyService propertyService)
@@ -29,6 +28,89 @@ namespace REAL_STATE.Areas.Admin.Controllers
             _developerRepository = developerRepository;
             _agentRepository = agentRepository;
             _propertyService = propertyService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var properties = await _propertyRepository.GetAllAsync(includeProperties: "Developer,Agent");
+            return View(properties);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Upsert(string? id)
+        {
+            var vm = new PropertyVM();
+
+            if (!string.IsNullOrEmpty(id))
+            {
+                var property = await _propertyRepository.GetAsync(x => x.Id == id);
+                if (property == null)
+                    return NotFound();
+
+                vm.Property = property;
+                vm.IsEdit = true;
+            }
+
+            await LoadListsAsync(vm);
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Upsert(PropertyVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                var exists = await _propertyRepository.GetAsync(x => x.Id == vm.Property.Id);
+                vm.IsEdit = exists != null;
+                await LoadListsAsync(vm);
+                return View(vm);
+            }
+
+            if (string.IsNullOrWhiteSpace(vm.Property.AgentId))
+                vm.Property.AgentId = null;
+
+            try
+            {
+                var existing = await _propertyRepository.GetAsync(x => x.Id == vm.Property.Id);
+
+                if (existing == null)
+                {
+                    await _propertyService.AddProperty(vm);
+                    TempData["SuccessMessage"] = "Property added successfully.";
+                }
+                else
+                {
+                    await _propertyService.UpdateProperty(vm);
+                    TempData["SuccessMessage"] = "Property updated successfully.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var property = await _propertyRepository.GetAsync(x => x.Id == id);
+            if (property == null)
+                return NotFound(new { success = false, message = "Property not found." });
+
+            try
+            {
+                 _propertyRepository.Remove(property);  
+                await _propertyRepository.Save();
+                return Json(new { success = true, message = "Property deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         private async Task LoadListsAsync(PropertyVM vm)
@@ -48,42 +130,5 @@ namespace REAL_STATE.Areas.Admin.Controllers
                 Text = x.FullName
             }).ToList();
         }
-
-        [HttpGet]
-        public async Task<IActionResult> Upsert()
-        {
-            var vm = new PropertyVM { Property = new() };
-            await LoadListsAsync(vm);
-            return View(vm);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Upsert(PropertyVM vm)
-        {
-            if (!ModelState.IsValid)
-            {
-                await LoadListsAsync(vm);
-                return View(vm);
-            }
-
-            try
-            {
-                await _propertyService.AddProperty(vm);
-                TempData["SuccessMessage"] = "Added property successfully";
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-        public async Task<IActionResult> Index()
-        {
-            var properties = await _propertyRepository.GetAllAsync(includeProperties: "Developer,Agent");
-
-            return View(properties);
-        }
-
     }
 }

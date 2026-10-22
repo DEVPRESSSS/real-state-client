@@ -30,6 +30,7 @@ builder.Services.AddScoped<IAgentRepository, AgentRepository>();
 
 #region -- Register services
 builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.AddScoped<IAgentService, AgentService>();
 #endregion
 var app = builder.Build();
 

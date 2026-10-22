@@ -4,6 +4,8 @@
     ViewData["Title"] = "Properties";
 }
 
+@Html.AntiForgeryToken()
+
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
     <div>
         <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Properties</h1>
@@ -52,11 +54,12 @@
                                         <i class="bi bi-pencil-square me-1"></i>Edit
                                     </a>
 
-                                    <a asp-area="Admin" asp-controller="Property" asp-action="Delete"
-                                       asp-route-id="@property.Id"
-                                       class="btn btn-sm btn-danger">
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger js-delete"
+                                            data-id="@property.Id"
+                                            data-title="@property.Title">
                                         <i class="bi bi-trash me-1"></i>Delete
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -78,22 +81,6 @@ else
 }
 
 @section Scripts {
-    <script>
-        $(function () {
-            if (document.getElementById('propertyTable')) {
-                new DataTable('#propertyTable', {
-                    pageLength: 10,
-                    order: [],
-                    columnDefs: [
-                        { orderable: false, targets: -1 }
-                    ],
-                    language: {
-                        search: 'Search:',
-                        emptyTable: 'No properties found.',
-                        zeroRecords: 'No matching properties found.'
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="/js/property.js"></script>
+      
 }

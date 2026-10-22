@@ -119,6 +119,31 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["SuccessMessage"] is string successMsg)
+    {
+        <script>
+      
+            Swal.fire({
+            title: @Html.Raw(Json.Serialize(successMsg)),
+            icon: "success",
+            draggable: true
+            });
+        </script>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMsg)
+    {
+        <script>
+            Swal.fire({
+            icon: 'error',
+            title: 'Something went wrong',
+            text: @Html.Raw(Json.Serialize(errorMsg))
+            });
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

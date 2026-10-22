@@ -1,0 +1,86 @@
+﻿@using REAL_STATE.Models
+@model IEnumerable<Property>
+@{
+    ViewData["Title"] = "Properties";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
+    <div>
+        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Properties</h1>
+        <p class="text-secondary mb-0">Manage all property listings.</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="btn btn-outline-primary">
+        <i class="bi bi-plus-lg me-1"></i>Create
+    </a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card border shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="propertyTable" class="table table-hover align-middle w-100">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Listing</th>
+                            <th>Price</th>
+                            <th>City</th>
+                            <th>Developer</th>
+                            <th>Status</th>
+                            <th>Featured</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var property in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@property.Title</td>
+                                <td>@property.PropertyType</td>
+                                <td>@property.ListingType</td>
+                                <td data-order="@property.Price">₱@property.Price.ToString("N2")</td>
+                                <td>@property.City</td>
+                                <td>@property.Developer?.Name</td>
+                                <td>@property.Status</td>
+                                <td>@(property.IsFeatured ? "Yes" : "No")</td>
+                                <td class="text-end text-nowrap">
+                                    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert"
+                                       asp-route-id="@property.Id"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pencil-square me-1"></i>Edit
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger js-delete"
+                                            data-id="@property.Id"
+                                            data-title="@property.Title">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center bg-white border rounded p-5">
+        <h2 class="h5">No properties yet</h2>
+        <p class="text-secondary">Add your first property to see it listed here.</p>
+        <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="btn btn-success">
+            Add property
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script src="/js/property.js"></script>
+      
+}
