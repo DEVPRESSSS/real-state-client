@@ -1,133 +1,78 @@
 ﻿@using REAL_STATE.Models
-@using REAL_STATE.Models.VM
-@model PropertyVM
+@model Agent
+@{
+    var isEdit = ViewData["IsEdit"] as bool? ?? false;
+}
 
 <div class="container py-4 py-lg-5">
     <div class="mb-4">
         <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">
-            @(Model.IsEdit ? "Edit property" : "List a property")
+            @(isEdit ? "Edit agent" : "Add an agent")
         </h1>
         <p class="text-secondary mb-0">Fields marked <span class="text-danger">*</span> are required.</p>
     </div>
 
-    <form asp-area="Admin" asp-controller="Property" asp-action="Upsert" method="post" novalidate>
-        <input type="hidden" asp-for="Property.Id" />
+    <form asp-area="Admin" asp-controller="Agent" asp-action="Upsert" method="post" novalidate>
+        <input type="hidden" asp-for="Id" />
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
         <div class="row g-4">
             <div class="col-12 col-lg-8">
 
-                <!-- Basic information -->
-                <section class="card border shadow-sm mb-4" aria-labelledby="basic-heading">
+                <!-- Personal information -->
+                <section class="card border shadow-sm mb-4" aria-labelledby="personal-heading">
                     <div class="card-body">
-                        <h2 id="basic-heading" class="h5 mb-3">Basic information</h2>
+                        <h2 id="personal-heading" class="h5 mb-3">Personal information</h2>
                         <div class="row g-3">
                             <div class="col-12">
-                                <label asp-for="Property.Title" class="form-label">Title <span class="text-danger">*</span></label>
-                                <input asp-for="Property.Title" class="form-control" maxlength="200"
-                                       placeholder="e.g. 2-bedroom condominium near BGC" />
-                                <span asp-validation-for="Property.Title" class="text-danger small"></span>
+                                <label asp-for="FullName" class="form-label">Full name <span class="text-danger">*</span></label>
+                                <input asp-for="FullName" class="form-control" maxlength="150"
+                                       placeholder="e.g. Maria Santos" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input asp-for="Email" type="email" class="form-control" maxlength="200"
+                                       placeholder="agent@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Phone" class="form-label">Phone</label>
+                                <input asp-for="Phone" type="tel" class="form-control" maxlength="30"
+                                       placeholder="+63 900 000 0000" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12">
-                                <label asp-for="Property.Slug" class="form-label">URL slug <span class="text-danger">*</span></label>
-                                <input asp-for="Property.Slug" class="form-control" maxlength="250"
-                                       placeholder="2-bedroom-condominium-near-bgc"
-                                       aria-describedby="slugHelp" />
-                                <div id="slugHelp" class="form-text">Must be unique. Use lowercase letters, numbers and hyphens.</div>
-                                <span asp-validation-for="Property.Slug" class="text-danger small"></span>
+                                <label asp-for="Bio" class="form-label">Bio</label>
+                                <textarea asp-for="Bio" class="form-control" rows="6" maxlength="2000"
+                                          placeholder="A short introduction shown on the agent's profile."></textarea>
+                                <span asp-validation-for="Bio" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Professional details -->
+                <section class="card border shadow-sm mb-4" aria-labelledby="pro-heading">
+                    <div class="card-body">
+                        <h2 id="pro-heading" class="h5 mb-3">Professional details</h2>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="LicenseNumber" class="form-label">License number</label>
+                                <input asp-for="LicenseNumber" class="form-control" maxlength="50" />
+                                <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label asp-for="Property.PropertyType" class="form-label">Property type <span class="text-danger">*</span></label>
-                                <input asp-for="Property.PropertyType" class="form-control" maxlength="50"
-                                       placeholder="e.g. Condominium" />
-                                <span asp-validation-for="Property.PropertyType" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Property.ListingType" class="form-label">Listing type <span class="text-danger">*</span></label>
-                                <select asp-for="Property.ListingType" class="form-select">
-                                    <option value="Sale">For sale</option>
-                                    <option value="Rent">For rent</option>
+                                <label asp-for="Role" class="form-label">Role <span class="text-danger">*</span></label>
+                                <select asp-for="Role" class="form-select">
+                                    <option value="Agent">Agent</option>
+                                    <option value="Broker">Broker</option>
                                 </select>
-                                <span asp-validation-for="Property.ListingType" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12">
-                                <label asp-for="Property.Description" class="form-label">Description</label>
-                                <textarea asp-for="Property.Description" class="form-control" rows="6" maxlength="8000"></textarea>
-                                <span asp-validation-for="Property.Description" class="text-danger small"></span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Price and specifications -->
-                <section class="card border shadow-sm mb-4" aria-labelledby="specs-heading">
-                    <div class="card-body">
-                        <h2 id="specs-heading" class="h5 mb-3">Price and specifications</h2>
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Property.Price" class="form-label">Price <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text">₱</span>
-                                    <input asp-for="Property.Price" type="number" min="0" step="any" class="form-control" />
-                                </div>
-                                <span asp-validation-for="Property.Price" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Property.FloorAreaSqFt" class="form-label">Floor area <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input asp-for="Property.FloorAreaSqFt" type="number" min="0" step="any" class="form-control" />
-                                    <span class="input-group-text">sq ft</span>
-                                </div>
-                                <span asp-validation-for="Property.FloorAreaSqFt" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-6">
-                                <label asp-for="Property.Bedrooms" class="form-label">Bedrooms</label>
-                                <input asp-for="Property.Bedrooms" type="number" min="0" step="1" class="form-control" />
-                                <span asp-validation-for="Property.Bedrooms" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-6">
-                                <label asp-for="Property.Bathrooms" class="form-label">Bathrooms</label>
-                                <input asp-for="Property.Bathrooms" type="number" min="0" step="1" class="form-control" />
-                                <span asp-validation-for="Property.Bathrooms" class="text-danger small"></span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Location -->
-                <section class="card border shadow-sm mb-4" aria-labelledby="location-heading">
-                    <div class="card-body">
-                        <h2 id="location-heading" class="h5 mb-3">Location</h2>
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label asp-for="Property.Address" class="form-label">Street address</label>
-                                <input asp-for="Property.Address" class="form-control" maxlength="300" />
-                                <span asp-validation-for="Property.Address" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 col-md-4">
-                                <label asp-for="Property.City" class="form-label">City <span class="text-danger">*</span></label>
-                                <input asp-for="Property.City" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Property.City" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 col-md-4">
-                                <label asp-for="Property.Province" class="form-label">Province</label>
-                                <input asp-for="Property.Province" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Property.Province" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 col-md-4">
-                                <label asp-for="Property.Country" class="form-label">Country <span class="text-danger">*</span></label>
-                                <input asp-for="Property.Country" class="form-control" maxlength="100" />
-                                <span asp-validation-for="Property.Country" class="text-danger small"></span>
+                                <span asp-validation-for="Role" class="text-danger small"></span>
                             </div>
                         </div>
                     </div>
@@ -136,44 +81,41 @@
 
             <!-- Sidebar -->
             <div class="col-12 col-lg-4">
-                <section class="card border shadow-sm mb-4" aria-labelledby="assign-heading">
+                <section class="card border shadow-sm mb-4" aria-labelledby="photo-heading">
                     <div class="card-body">
-                        <h2 id="assign-heading" class="h5 mb-3">Listing details</h2>
+                        <h2 id="photo-heading" class="h5 mb-3">Profile</h2>
 
-                        <div class="mb-3">
-                            <label asp-for="Property.DeveloperId" class="form-label">Developer <span class="text-danger">*</span></label>
-                            <select asp-for="Property.DeveloperId" asp-items="Model.Developers" class="form-select">
-                                <option value="">Select a developer</option>
-                            </select>
-                            <span asp-validation-for="Property.DeveloperId" class="text-danger small"></span>
+                        <div class="text-center mb-3">
+                            @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
+                            {
+                                <img src="@Model.PhotoUrl" alt="Agent photo" class="rounded-circle object-fit-cover"
+                                     style="width:96px;height:96px;" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-person-circle display-3 text-secondary"></i>
+                            }
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Property.AgentId" class="form-label">Agent or broker</label>
-                            <select asp-for="Property.AgentId" asp-items="Model.Agents" class="form-select">
-                                <option value="">No agent assigned</option>
-                            </select>
-                            <span asp-validation-for="Property.AgentId" class="text-danger small"></span>
+                            <label asp-for="PhotoUrl" class="form-label">Photo URL</label>
+                            <input asp-for="PhotoUrl" class="form-control" maxlength="500"
+                                   placeholder="https://..." />
+                            <span asp-validation-for="PhotoUrl" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Property.Status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <input asp-for="Property.Status" class="form-control" maxlength="30" />
-                            <span asp-validation-for="Property.Status" class="text-danger small"></span>
-                        </div>
-
-                        <div class="form-check">
-                            <input asp-for="Property.IsFeatured" class="form-check-input" />
-                            <label asp-for="Property.IsFeatured" class="form-check-label">Featured listing</label>
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label">Active</label>
                         </div>
                     </div>
                 </section>
 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-lg me-1"></i>Save property
+                        <i class="bi bi-check-lg me-1"></i>Save agent
                     </button>
-                    <a asp-area="Admin" asp-controller="Property" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <a asp-area="Admin" asp-controller="Agent" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
                 </div>
             </div>
         </div>

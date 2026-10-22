@@ -9,5 +9,7 @@ namespace REAL_STATE.Services.Interfaces
     {
         Task AddAgent(Agent agent);
         Task UpdateAgent(Agent agent);
+
+      
     }
 }

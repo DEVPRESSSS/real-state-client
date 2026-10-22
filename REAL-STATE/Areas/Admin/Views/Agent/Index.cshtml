@@ -1,17 +1,17 @@
 ﻿@using REAL_STATE.Models
-@model IEnumerable<Property>
+@model IEnumerable<Agent>
 @{
-    ViewData["Title"] = "Properties";
+    ViewData["Title"] = "Agents";
 }
 
 @Html.AntiForgeryToken()
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
     <div>
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Properties</h1>
-        <p class="text-secondary mb-0">Manage all property listings.</p>
+        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Agents</h1>
+        <p class="text-secondary mb-0">Manage agents and brokers.</p>
     </div>
-    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="btn btn-outline-primary">
+    <a asp-area="Admin" asp-controller="Agent" asp-action="Upsert" class="btn btn-outline-primary">
         <i class="bi bi-plus-lg me-1"></i>Create
     </a>
 </div>
@@ -21,43 +21,64 @@
     <div class="card border shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="propertyTable" class="table table-hover align-middle w-100">
+                <table id="agentTable" class="table table-hover align-middle w-100">
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Listing</th>
-                            <th>Price</th>
-                            <th>City</th>
-                            <th>Developer</th>
+                            <th>Agent</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>License</th>
+                            <th>Role</th>
                             <th>Status</th>
-                            <th>Featured</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var property in Model)
+                        @foreach (var agent in Model)
                         {
                             <tr>
-                                <td class="fw-semibold">@property.Title</td>
-                                <td>@property.PropertyType</td>
-                                <td>@property.ListingType</td>
-                                <td data-order="@property.Price">₱@property.Price.ToString("N2")</td>
-                                <td>@property.City</td>
-                                <td>@property.Developer?.Name</td>
-                                <td>@property.Status</td>
-                                <td>@(property.IsFeatured ? "Yes" : "No")</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (!string.IsNullOrWhiteSpace(agent.PhotoUrl))
+                                        {
+                                            <img src="@agent.PhotoUrl" alt="" class="rounded-circle object-fit-cover"
+                                                 style="width:36px;height:36px;" />
+                                        }
+                                        else
+                                        {
+                                            <span class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center fw-semibold"
+                                                  style="width:36px;height:36px;">
+                                                @(string.IsNullOrWhiteSpace(agent.FullName) ? "?" : agent.FullName.Trim()[0].ToString().ToUpper())
+                                            </span>
+                                        }
+                                        <span class="fw-semibold">@agent.FullName</span>
+                                    </div>
+                                </td>
+                                <td>@agent.Email</td>
+                                <td>@agent.Phone</td>
+                                <td>@agent.LicenseNumber</td>
+                                <td>@agent.Role</td>
+                                <td>
+                                    @if (agent.IsActive)
+                                    {
+                                        <span class="badge text-bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-secondary">Inactive</span>
+                                    }
+                                </td>
                                 <td class="text-end text-nowrap">
-                                    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert"
-                                       asp-route-id="@property.Id"
+                                    <a asp-area="Admin" asp-controller="Agent" asp-action="Upsert"
+                                       asp-route-id="@agent.Id"
                                        class="btn btn-sm btn-primary">
                                         <i class="bi bi-pencil-square me-1"></i>Edit
                                     </a>
 
                                     <button type="button"
                                             class="btn btn-sm btn-danger js-delete"
-                                            data-id="@property.Id"
-                                            data-title="@property.Title">
+                                            data-id="@agent.Id"
+                                            data-title="@agent.FullName">
                                         <i class="bi bi-trash me-1"></i>Delete
                                     </button>
                                 </td>
@@ -72,15 +93,14 @@
 else
 {
     <div class="text-center bg-white border rounded p-5">
-        <h2 class="h5">No properties yet</h2>
-        <p class="text-secondary">Add your first property to see it listed here.</p>
-        <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="btn btn-success">
-            Add property
+        <h2 class="h5">No agents yet</h2>
+        <p class="text-secondary">Add your first agent to see them listed here.</p>
+        <a asp-area="Admin" asp-controller="Agent" asp-action="Upsert" class="btn btn-success">
+            Add agent
         </a>
     </div>
 }
 
 @section Scripts {
-    <script src="/js/property.js"></script>
-      
+    <script src="/js/agent.js"></script>
 }
