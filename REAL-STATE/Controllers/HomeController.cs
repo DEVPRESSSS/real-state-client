@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using REAL_STATE.Models;
 using REAL_STATE.Models.DTO.PropertyDTO;
 using REAL_STATE.Models.VM;
+using REAL_STATE.Services;
 using REAL_STATE.Services.Interfaces;
 using System.Diagnostics;
 
@@ -10,13 +11,19 @@ namespace REAL_STATE.Controllers
     public class HomeController : Controller
     {
         private readonly IPropertyService _propertyService;
+        private readonly IDeveloperService _developerService;
         private readonly IAgentService _agentService;
         private const int PageSize = 10;  
 
-        public HomeController(IPropertyService propertyService, IAgentService agentService)
+        public HomeController(IPropertyService propertyService,
+            
+            IAgentService agentService,
+            IDeveloperService developerService
+            )
         {
             _propertyService = propertyService;
             _agentService = agentService;
+            _developerService= developerService;
         }
     
         public async Task<IActionResult> Index([FromQuery] CriteriaDTO criteria)
@@ -53,7 +60,23 @@ namespace REAL_STATE.Controllers
             TempData["SuccessMessage"] = "Registration received. An admin will review and activate your profile.";
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> Details(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return NotFound();
 
+            var vm = await _propertyService.GetDetails(id);
+            if (vm == null)
+                return NotFound();
+
+            return View(vm);
+        }
+
+        public async Task<IActionResult> Developers()
+        {
+            var developers = await _developerService.GetActiveDevelopers();
+            return View(developers);
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

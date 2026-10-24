@@ -58,11 +58,13 @@
             }
         </ul>
 
-        <a asp-controller="Properties"
+        @* <a asp-controller="Properties"
            asp-action="Details"
            asp-route-slug="@Model.Slug"
            class="btn btn-outline-success mt-auto stretched-link">
             View details
-        </a>
+        </a> *@
+        <a asp-area="" asp-controller="Home" asp-action="Details" asp-route-id="@Model.Id"
+           class="btn btn-outline-success w-100">View Details</a>
     </div>
 </article>

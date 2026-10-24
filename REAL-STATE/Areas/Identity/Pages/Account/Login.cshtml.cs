@@ -132,6 +132,12 @@ public class LoginModel : PageModel
                     return LocalRedirect(Url.Action("Index", "Listing", new { area = "AgentAndBroker" })!);
 
                 }
+                else
+                {
+                    return LocalRedirect(Url.Action("Index", "Home", new { area = "" })!);
+
+                }
+
 
             }
             if (result.RequiresTwoFactor)

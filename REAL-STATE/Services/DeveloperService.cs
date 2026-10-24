@@ -27,6 +27,27 @@ namespace REAL_STATE.Services
             await _developerRepository.AddAsync(developer);
             await _developerRepository.Save();
         }
+
+        public async Task<List<DeveloperCardVM>> GetActiveDevelopers()
+        {
+            var developers = await _developerRepository.GetAllAsync(
+                x => x.IsActive,
+                includeProperties: "Properties");
+
+            return developers
+                .OrderBy(x => x.Name)
+                .Select(d => new DeveloperCardVM
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    LogoUrl = d.LogoUrl,
+                    Description = d.Description,
+                    WebsiteUrl = d.WebsiteUrl,
+                    AvailableListings = d.Properties.Count(p => p.Status == "Available")
+                })
+                .ToList();
+        }
+
         public async Task UpdateDeveloper(Developers developer)
         {
             var developerObj = await _developerRepository.GetAsync(x => x.Id == developer.Id);

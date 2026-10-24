@@ -9,5 +9,6 @@ namespace REAL_STATE.Services.Interfaces
     {
         Task AddDeveloper(Developers developer);
         Task UpdateDeveloper(Developers developer);
+        Task<List<DeveloperCardVM>> GetActiveDevelopers();
     }
 }

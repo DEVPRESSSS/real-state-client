@@ -132,6 +132,21 @@ namespace REAL_STATE.Services
                 .ToListAsync();
         }
 
-       
+        public async Task<PropertyDetailsVM?> GetDetails(string id)
+        {
+            var property = (await _propertyRepository.GetAllAsync(
+                    x => x.Id == id,
+                    includeProperties: "Developer,Agent"))
+                .FirstOrDefault();
+
+            if (property == null)
+                return null;
+
+            return new PropertyDetailsVM
+            {
+                Property = property,
+                Agent = property.Agent is { IsActive: true } ? property.Agent : null
+            };
+        }
     }
 }

@@ -1,0 +1,245 @@
+﻿@using REAL_STATE.Models.VM
+@model PropertyDetailsVM
+@{
+    var p = Model.Property;
+    var a = Model.Agent;
+    ViewData["Title"] = p.Title;
+
+    var location = string.Join(", ", new[] { p.Address, p.City, p.Province, p.Country }
+        .Where(x => !string.IsNullOrWhiteSpace(x)));
+}
+
+<div class="container py-4 py-lg-5">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index" asp-route-listingType="@p.ListingType">
+                    Properties for @(p.ListingType == "Rent" ? "rent" : "sale")
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@p.Title</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- Property information -->
+        <div class="col-12 col-lg-8">
+
+            <div class="mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    <span class="badge @(p.ListingType == "Rent" ? "text-bg-info" : "text-bg-primary")">
+                        For @(p.ListingType == "Rent" ? "rent" : "sale")
+                    </span>
+                    <span class="badge text-bg-light border">@p.PropertyType</span>
+                    <span class="badge text-bg-success">@p.Status</span>
+                    @if (p.IsFeatured)
+                    {
+                        <span class="badge text-bg-warning"><i class="bi bi-star-fill me-1"></i>Featured</span>
+                    }
+                </div>
+
+                <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">@p.Title</h1>
+                <p class="text-secondary mb-3"><i class="bi bi-geo-alt me-1"></i>@location</p>
+                <div class="display-6 fw-semibold text-success">
+                    ₱@p.Price.ToString("N2")@(p.ListingType == "Rent" ? " / month" : "")
+                </div>
+            </div>
+
+            <!-- Key facts -->
+            <div class="card border shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
+                        <div class="col">
+                            <i class="bi bi-door-closed fs-4 text-secondary"></i>
+                            <div class="fw-semibold">@(p.Bedrooms?.ToString() ?? "-")</div>
+                            <div class="small text-secondary">Bedrooms</div>
+                        </div>
+                        <div class="col">
+                            <i class="bi bi-droplet fs-4 text-secondary"></i>
+                            <div class="fw-semibold">@(p.Bathrooms?.ToString() ?? "-")</div>
+                            <div class="small text-secondary">Bathrooms</div>
+                        </div>
+                        <div class="col">
+                            <i class="bi bi-arrows-fullscreen fs-4 text-secondary"></i>
+                            <div class="fw-semibold">@p.FloorAreaSqFt.ToString("N0") sq ft</div>
+                            <div class="small text-secondary">Floor area</div>
+                        </div>
+                        <div class="col">
+                            <i class="bi bi-house-door fs-4 text-secondary"></i>
+                            <div class="fw-semibold">@p.PropertyType</div>
+                            <div class="small text-secondary">Type</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="card border shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">About this property</h2>
+                    @if (!string.IsNullOrWhiteSpace(p.Description))
+                    {
+                        <p class="mb-0" style="white-space:pre-line;">@p.Description</p>
+                    }
+                    else
+                    {
+                        <p class="text-secondary mb-0">No description provided.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Details table -->
+            <div class="card border shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Property details</h2>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-secondary fw-normal">Listing type</dt>
+                        <dd class="col-sm-8">@p.ListingType</dd>
+
+                        <dt class="col-sm-4 text-secondary fw-normal">Status</dt>
+                        <dd class="col-sm-8">@p.Status</dd>
+
+                        <dt class="col-sm-4 text-secondary fw-normal">Address</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(p.Address) ? "-" : p.Address)</dd>
+
+                        <dt class="col-sm-4 text-secondary fw-normal">City</dt>
+                        <dd class="col-sm-8">@p.City</dd>
+
+                        <dt class="col-sm-4 text-secondary fw-normal">Province</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(p.Province) ? "-" : p.Province)</dd>
+
+                        <dt class="col-sm-4 text-secondary fw-normal">Country</dt>
+                        <dd class="col-sm-8">@p.Country</dd>
+
+                        <dt class="col-sm-4 text-secondary fw-normal">Listed on</dt>
+                        <dd class="col-sm-8 mb-0">@p.CreatedAt.ToString("MMMM dd, yyyy")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: agent and developer -->
+        <div class="col-12 col-lg-4">
+            <div class="position-sticky" style="top: 5.5rem;">
+
+                <div class="card border shadow-sm mb-4">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3">Listed by</h2>
+
+                        @if (a != null)
+                        {
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                @if (!string.IsNullOrWhiteSpace(a.PhotoUrl))
+                                {
+                                    <img src="@a.PhotoUrl" alt="@a.FullName" class="rounded-circle object-fit-cover"
+                                         style="width:72px;height:72px;" />
+                                }
+                                else
+                                {
+                                    <span class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center"
+                                          style="width:72px;height:72px;">
+                                        <i class="bi bi-person-fill fs-2"></i>
+                                    </span>
+                                }
+                                <div>
+                                    <div class="fw-semibold">@a.FullName</div>
+                                    <div class="small text-secondary">@a.Role</div>
+                                    @if (!string.IsNullOrWhiteSpace(a.LicenseNumber))
+                                    {
+                                        <span class="badge text-bg-primary mt-1">
+                                            <i class="bi bi-patch-check-fill me-1"></i>Verified
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(a.Bio))
+                            {
+                                <p class="small text-secondary">@a.Bio</p>
+                            }
+
+                            <ul class="list-unstyled small mb-3">
+                                @if (!string.IsNullOrWhiteSpace(a.LicenseNumber))
+                                {
+                                    <li class="mb-1"><i class="bi bi-card-text me-2 text-secondary"></i>License: @a.LicenseNumber</li>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(a.Phone))
+                                {
+                                    <li class="mb-1">
+                                        <i class="bi bi-telephone me-2 text-secondary"></i>
+                                        <a href="tel:@a.Phone" class="text-decoration-none">@a.Phone</a>
+                                    </li>
+                                }
+                                <li>
+                                    <i class="bi bi-envelope me-2 text-secondary"></i>
+                                    <a href="mailto:@a.Email" class="text-decoration-none text-break">@a.Email</a>
+                                </li>
+                            </ul>
+
+                            <div class="d-grid gap-2">
+                                <a class="btn btn-success"
+                                   href="mailto:@a.Email?subject=Inquiry about @p.Title">
+                                    <i class="bi bi-envelope me-1"></i>Contact agent
+                                </a>
+                                @if (!string.IsNullOrWhiteSpace(a.Phone))
+                                {
+                                    <a class="btn btn-outline-success" href="tel:@a.Phone">
+                                        <i class="bi bi-telephone me-1"></i>Call
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-secondary mb-0">
+                                This listing is handled directly by the developer.
+                            </p>
+                        }
+                    </div>
+                </div>
+
+                @if (p.Developer != null)
+                {
+                    <div class="card border shadow-sm">
+                        <div class="card-body">
+                            <h2 class="h5 mb-3">Developer</h2>
+                            <div class="d-flex align-items-center gap-3">
+                                @if (!string.IsNullOrWhiteSpace(p.Developer.LogoUrl))
+                                {
+                                    <img src="@p.Developer.LogoUrl" alt="@p.Developer.Name"
+                                         class="rounded object-fit-contain border bg-white" style="width:56px;height:56px;" />
+                                }
+                                else
+                                {
+                                    <span class="rounded bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center"
+                                          style="width:56px;height:56px;">
+                                        <i class="bi bi-building fs-4"></i>
+                                    </span>
+                                }
+                                <div>
+                                    <div class="fw-semibold">@p.Developer.Name</div>
+                                    @if (!string.IsNullOrWhiteSpace(p.Developer.WebsiteUrl))
+                                    {
+                                        <a href="@p.Developer.WebsiteUrl" target="_blank" rel="noopener noreferrer"
+                                           class="small text-decoration-none">
+                                            Visit website <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-controller="Home" asp-action="Index" asp-route-listingType="@p.ListingType"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to listings
+        </a>
+    </div>
+</div>

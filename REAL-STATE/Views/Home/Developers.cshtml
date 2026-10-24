@@ -1,1 +1,86 @@
-﻿
+﻿@using REAL_STATE.Models.VM
+@model IEnumerable<DeveloperCardVM>
+@{
+    ViewData["Title"] = "Developers";
+}
+
+<section class="bg-white border-bottom py-5">
+    <div class="container-xxl">
+        <h1 class="display-4 fw-semibold text-primary-emphasis mb-3" style="font-family:'Playfair Display',serif;">
+            Our developers
+        </h1>
+        <p class="text-secondary mb-0">Trusted developers behind the projects listed on our platform.</p>
+    </div>
+</section>
+
+<section class=" bg-opacity-50 py-5">
+    <div class="container-xxl">
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+                @foreach (var d in Model)
+                {
+                    <div class="col">
+                        <article class="card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    @if (!string.IsNullOrWhiteSpace(d.LogoUrl))
+                                    {
+                                        <img src="@d.LogoUrl" alt="@d.Name" loading="lazy"
+                                             class="rounded object-fit-contain border bg-white p-1"
+                                             style="width:64px;height:64px;" />
+                                    }
+                                    else
+                                    {
+                                        <span class="rounded bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center"
+                                              style="width:64px;height:64px;">
+                                            <i class="bi bi-building fs-3"></i>
+                                        </span>
+                                    }
+                                    <h2 class="h5 mb-0 text-primary-emphasis" style="font-family:'Playfair Display',serif;">
+                                        @d.Name
+                                    </h2>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(d.Description))
+                                {
+                                    <p class="small text-secondary">@d.Description</p>
+                                }
+                                else
+                                {
+                                    <p class="small text-secondary">No description provided.</p>
+                                }
+
+                                <div class="d-flex justify-content-between small border-top pt-3 mb-3 mt-auto">
+                                    <span class="text-secondary">Listings</span>
+                                    <span>@d.AvailableListings available</span>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(d.WebsiteUrl))
+                                {
+                                    <a href="@d.WebsiteUrl" target="_blank" rel="noopener noreferrer"
+                                       class="btn btn-primary rounded-0">
+                                        Visit website <i class="bi bi-arrow-up-right ms-1"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-secondary rounded-0" disabled>No website</button>
+                                }
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-building display-4"></i>
+                <p class="mt-2 mb-0">No developers available yet.</p>
+            </div>
+        }
+    </div>
+</section>

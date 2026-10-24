@@ -26,5 +26,14 @@
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
+	<ItemGroup>
+		<Content Update="appsettings.Production.json" CopyToPublishDirectory="Never" />
+	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas\Client\Controllers\" />
+    <Folder Include="Areas\Client\Data\" />
+    <Folder Include="Areas\Client\Models\" />
+    <Folder Include="Areas\Client\Views\" />
+  </ItemGroup>
 
 </Project>

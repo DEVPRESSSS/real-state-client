@@ -11,14 +11,18 @@ using REAL_STATE.Utilities;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); 
+builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<ApplicationDbContext>(o =>
-    o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Connection string comes from User Secrets (local) or appsettings.Production.json (server)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString) || connectionString == "SET_IN_SECRETS_OR_SERVER")
+    throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>() 
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 #region -- Register Repository
@@ -35,6 +39,7 @@ builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IDeveloperService, DeveloperService>();
 builder.Services.AddScoped<IUserService, UserService>();
 #endregion
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -46,7 +51,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -63,8 +68,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages().WithStaticAssets();
 
-// Seed roles
-// Seed roles
+// Seed roles and admin
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -74,44 +78,49 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // Seed admin user
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-    const string adminEmail = "xmontemorjerald@gmail.com";
-    var adminPassword = "Montemor123#!";
+    var adminEmail = config["SeedAdmin:Email"];
+    var adminPassword = config["SeedAdmin:Password"];
 
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
+    if (string.IsNullOrWhiteSpace(adminEmail))
     {
-        if (string.IsNullOrWhiteSpace(adminPassword))
-        {
-            app.Logger.LogWarning("SeedAdmin:Password is not configured. Admin user was not created.");
-        }
-        else
-        {
-            adminUser = new ApplicationUser
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                EmailConfirmed = true,
-                FullName = "Administrator"
-            };
+        app.Logger.LogWarning("SeedAdmin:Email is not configured. Admin seeding skipped.");
+    }
+    else
+    {
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-            var result = await userManager.CreateAsync(adminUser, adminPassword);
-            if (!result.Succeeded)
+        if (adminUser == null)
+        {
+            if (string.IsNullOrWhiteSpace(adminPassword))
             {
-                app.Logger.LogError("Failed to create admin user: {Errors}",
-                    string.Join("; ", result.Errors.Select(e => e.Description)));
-                adminUser = null;
+                app.Logger.LogWarning("SeedAdmin:Password is not configured. Admin user was not created.");
+            }
+            else
+            {
+                adminUser = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true,
+                    FullName = "Administrator"
+                };
+
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                if (!result.Succeeded)
+                {
+                    app.Logger.LogError("Failed to create admin user: {Errors}",
+                        string.Join("; ", result.Errors.Select(e => e.Description)));
+                    adminUser = null;
+                }
             }
         }
-    }
 
-    if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, RoleSD.Admin))
-    {
-        await userManager.AddToRoleAsync(adminUser, RoleSD.Admin);
+        if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, RoleSD.Admin))
+            await userManager.AddToRoleAsync(adminUser, RoleSD.Admin);
     }
 }
+
 app.Run();
