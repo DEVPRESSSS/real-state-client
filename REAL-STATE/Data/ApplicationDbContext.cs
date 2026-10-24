@@ -88,7 +88,6 @@ namespace REAL_STATE.Data
                 entity.HasIndex(d => d.Slug).IsUnique();
                 entity.HasIndex(d => d.Name);
 
-                // Developer -> Properties (Restrict: can't delete a developer that has listings)
                 entity.HasMany(d => d.Properties)
                       .WithOne(p => p.Developer)
                       .HasForeignKey(p => p.DeveloperId)

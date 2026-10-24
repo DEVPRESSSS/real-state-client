@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using REAL_STATE.Models;
-using REAL_STATE.Models.VM;
 using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services;
 using REAL_STATE.Services.Interfaces;
 using REAL_STATE.Utilities;
+using REAL_STATE.Models;
 
 namespace REAL_STATE.Areas.Admin.Controllers
 {
@@ -46,6 +45,8 @@ namespace REAL_STATE.Areas.Admin.Controllers
 
             return View(new Agent());
         }
+
+   
 
         [HttpPost]
         [ValidateAntiForgeryToken]

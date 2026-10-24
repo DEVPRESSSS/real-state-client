@@ -126,7 +126,11 @@ public class LoginModel : PageModel
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user != null && await _userManager.IsInRoleAsync(user, RoleSD.Admin))
                 {
-                    return LocalRedirect(Url.Action("Upsert", "Property", new { area = "Admin" })!);
+                    return LocalRedirect(Url.Action("Index", "Dashboard", new { area = "Admin" })!);
+                }else if(user != null && await _userManager.IsInRoleAsync(user, RoleSD.Agent))
+                {
+                    return LocalRedirect(Url.Action("Index", "Listing", new { area = "AgentAndBroker" })!);
+
                 }
 
             }

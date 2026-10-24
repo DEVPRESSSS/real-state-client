@@ -1,6 +1,6 @@
 ﻿@using REAL_STATE.Utilities
 @{
-    if (User.IsInRole(RoleSD.Admin))
+    if (User.IsInRole(RoleSD.Admin) || User.IsInRole(RoleSD.Agent))
     {
         Layout = "~/Views/Shared/_AdminLayout.cshtml";
     }

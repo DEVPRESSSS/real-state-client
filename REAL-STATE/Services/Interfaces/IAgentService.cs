@@ -9,7 +9,8 @@ namespace REAL_STATE.Services.Interfaces
     {
         Task AddAgent(Agent agent);
         Task UpdateAgent(Agent agent);
+        Task<PagedAgentsVM> GetAgentsPage(int page, int pageSize = 10);
+        Task RegisterAgent(AgentRegisterVM vm);
 
-      
     }
 }

@@ -1,0 +1,73 @@
+﻿@using REAL_STATE.Models.VM
+@model AgentRegisterVM
+@{
+    ViewData["Title"] = "Become an advisor";
+}
+
+<div class="container py-5" style="max-width: 760px;">
+    <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Become an advisor</h1>
+    <p class="text-secondary mb-4">Create your account and profile. An admin reviews every application.</p>
+
+    <form asp-controller="Home" asp-action="Register" method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="card border shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Your details</h2>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" type="email" class="form-control" autocomplete="email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" type="tel" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="LicenseNumber" class="form-label"></label>
+                        <input asp-for="LicenseNumber" class="form-control" />
+                        <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Bio" class="form-label"></label>
+                        <textarea asp-for="Bio" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Bio" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Password</h2>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" type="password" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Submit application</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

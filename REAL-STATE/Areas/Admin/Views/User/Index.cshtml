@@ -1,0 +1,117 @@
+﻿@using REAL_STATE.Models.VM
+@model IEnumerable<UserRowVM>
+@{
+    ViewData["Title"] = "Users";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
+    <div>
+        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Users</h1>
+        <p class="text-secondary mb-0">Manage user accounts and roles.</p>
+    </div>
+    <a asp-area="Admin" asp-controller="User" asp-action="Upsert" class="btn btn-outline-primary">
+        <i class="bi bi-plus-lg me-1"></i>Create
+    </a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card border shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="userTable" class="table table-hover align-middle w-100">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center fw-semibold"
+                                              style="width:36px;height:36px;">
+                                            @(string.IsNullOrWhiteSpace(user.FullName) ? "?" : user.FullName.Trim()[0].ToString().ToUpper())
+                                        </span>
+                                        <span class="fw-semibold">@user.FullName</span>
+                                        @if (user.IsCurrentUser)
+                                        {
+                                            <span class="badge text-bg-light border">You</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>@user.PhoneNumber</td>
+                                <td><span class="badge text-bg-primary">@user.Role</span></td>
+                                <td>
+                                    @if (user.IsLocked)
+                                    {
+                                        <span class="badge text-bg-danger">Locked</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-success">Active</span>
+                                    }
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <a asp-area="Admin" asp-controller="User" asp-action="Upsert"
+                                       asp-route-id="@user.Id"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pencil-square me-1"></i>Edit
+                                    </a>
+
+                                    @if (!user.IsCurrentUser)
+                                    {
+                                        if (user.IsLocked)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-success js-lock"
+                                                    data-id="@user.Id"
+                                                    data-title="@user.FullName"
+                                                    data-locked="false">
+                                                <i class="bi bi-unlock me-1"></i>Unlock
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning js-lock"
+                                                    data-id="@user.Id"
+                                                    data-title="@user.FullName"
+                                                    data-locked="true">
+                                                <i class="bi bi-lock me-1"></i>Lock
+                                            </button>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center bg-white border rounded p-5">
+        <h2 class="h5">No users yet</h2>
+        <p class="text-secondary">Add your first user to see them listed here.</p>
+        <a asp-area="Admin" asp-controller="User" asp-action="Upsert" class="btn btn-success">
+            Add user
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script src="/js/user.js"></script>
+}

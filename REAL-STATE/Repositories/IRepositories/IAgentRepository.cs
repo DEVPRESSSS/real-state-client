@@ -2,7 +2,7 @@
 
 namespace REAL_STATE.Repositories.IRepositories
 {
-    public interface IAgentRepository:IRepository<Agent>
+    public interface IUserRepository:IRepository<ApplicationUser>
     {
     }
 }

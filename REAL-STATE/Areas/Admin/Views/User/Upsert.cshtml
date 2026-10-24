@@ -1,0 +1,109 @@
+﻿@using REAL_STATE.Models.VM
+@model UserVM
+
+<div class="container py-4 py-lg-5">
+    <div class="mb-4">
+        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">
+            @(Model.IsEdit ? "Edit user" : "Add a user")
+        </h1>
+        <p class="text-secondary mb-0">Fields marked <span class="text-danger">*</span> are required.</p>
+    </div>
+
+    <form asp-area="Admin" asp-controller="User" asp-action="Upsert" method="post" novalidate>
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+
+                <!-- Account information -->
+                <section class="card border shadow-sm mb-4" aria-labelledby="account-heading">
+                    <div class="card-body">
+                        <h2 id="account-heading" class="h5 mb-3">Account information</h2>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="FullName" class="form-label">Full name <span class="text-danger">*</span></label>
+                                <input asp-for="FullName" class="form-control" maxlength="150"
+                                       placeholder="e.g. Juan Dela Cruz" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input asp-for="Email" type="email" class="form-control" maxlength="200"
+                                       placeholder="user@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label">Phone</label>
+                                <input asp-for="PhoneNumber" type="tel" class="form-control" maxlength="30"
+                                       placeholder="+63 900 000 0000" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Password -->
+                <section class="card border shadow-sm mb-4" aria-labelledby="password-heading">
+                    <div class="card-body">
+                        <h2 id="password-heading" class="h5 mb-3">Password</h2>
+
+                        @if (Model.IsEdit)
+                        {
+                            <p class="text-secondary small">Leave blank to keep the current password.</p>
+                        }
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Password" class="form-label">
+                                    Password @if (!Model.IsEdit)
+                                    {
+                                        <span class="text-danger">*</span>
+                                    }
+                                </label>
+                                <input asp-for="Password" type="password" class="form-control" autocomplete="new-password" />
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label">Confirm password</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-12 col-lg-4">
+                <section class="card border shadow-sm mb-4" aria-labelledby="role-heading">
+                    <div class="card-body">
+                        <h2 id="role-heading" class="h5 mb-3">Access</h2>
+
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label">Role <span class="text-danger">*</span></label>
+                            <select asp-for="Role" asp-items="Model.Roles" class="form-select">
+                                <option value="">Select a role</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-lg me-1"></i>Save user
+                    </button>
+                    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

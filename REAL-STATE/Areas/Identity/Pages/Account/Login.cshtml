@@ -49,11 +49,19 @@
                 <div class="text-center small">
                     <p class="mb-2">
                         New to Haven?
-                        <a class="link-success fw-semibold" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a>
+                        <a class="link-success fw-semibold" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">
+                            Register as a client
+                        </a>
+
+                   
                     </p>
                     <p class="mb-0">
-                        <a id="resend-confirmation" class="link-secondary" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+                        @* <a id="resend-confirmation" class="link-secondary" asp-page="./ResendEmailConfirmation">Resend email confirmation</a> *@
+                       <a class="link-success fw-semibold" asp-area="" asp-controller="Home" asp-action="Register">
+                        Register as an agent
+                    </a>
+                    </p> 
+
                 </div>
 
             </div>

@@ -26,12 +26,14 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IDeveloperRepository, DeveloperRepository>();
 builder.Services.AddScoped<IAgentRepository, AgentRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 #endregion
 
 #region -- Register services
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IDeveloperService, DeveloperService>();
+builder.Services.AddScoped<IUserService, UserService>();
 #endregion
 var app = builder.Build();
 
