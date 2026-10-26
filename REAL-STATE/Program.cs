@@ -24,6 +24,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+//    .AddEntityFrameworkStores<ApplicationDbContext>()
+//    .AddDefaultTokenProviders();
 
 #region -- Register Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -38,7 +41,11 @@ builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IDeveloperService, DeveloperService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+
 #endregion
+
+
 
 var app = builder.Build();
 
@@ -65,62 +72,23 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
+SeedDatabase();
 app.MapRazorPages().WithStaticAssets();
 
-// Seed roles and admin
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    foreach (var role in new[] { RoleSD.Admin, RoleSD.Agent, RoleSD.User })
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-            await roleManager.CreateAsync(new IdentityRole(role));
-    }
 
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-
-    var adminEmail = config["SeedAdmin:Email"];
-    var adminPassword = config["SeedAdmin:Password"];
-
-    if (string.IsNullOrWhiteSpace(adminEmail))
-    {
-        app.Logger.LogWarning("SeedAdmin:Email is not configured. Admin seeding skipped.");
-    }
-    else
-    {
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-        if (adminUser == null)
-        {
-            if (string.IsNullOrWhiteSpace(adminPassword))
-            {
-                app.Logger.LogWarning("SeedAdmin:Password is not configured. Admin user was not created.");
-            }
-            else
-            {
-                adminUser = new ApplicationUser
-                {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    EmailConfirmed = true,
-                    FullName = "Administrator"
-                };
-
-                var result = await userManager.CreateAsync(adminUser, adminPassword);
-                if (!result.Succeeded)
-                {
-                    app.Logger.LogError("Failed to create admin user: {Errors}",
-                        string.Join("; ", result.Errors.Select(e => e.Description)));
-                    adminUser = null;
-                }
-            }
-        }
-
-        if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, RoleSD.Admin))
-            await userManager.AddToRoleAsync(adminUser, RoleSD.Admin);
-    }
-}
 
 app.Run();
+
+void SeedDatabase()
+{
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Database initialization failed.");
+    }
+}
