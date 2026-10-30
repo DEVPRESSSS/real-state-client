@@ -5,3 +5,4 @@
 /.vs
 /REAL-STATE/bin/Debug/net10.0
 /REAL-STATE/obj
+/node_modules

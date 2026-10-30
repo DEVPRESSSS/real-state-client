@@ -7,6 +7,8 @@
 
     var location = string.Join(", ", new[] { p.Address, p.City, p.Province, p.Country }
         .Where(x => !string.IsNullOrWhiteSpace(x)));
+
+    var isAvailable = string.Equals(p.Status, "Available", StringComparison.OrdinalIgnoreCase);
 }
 
 <div class="container py-4 py-lg-5">
@@ -120,10 +122,40 @@
             </div>
         </div>
 
-        <!-- Sidebar: agent and developer -->
+        <!-- Sidebar: viewing, agent and developer -->
         <div class="col-12 col-lg-4">
             <div class="position-sticky" style="top: 5.5rem;">
 
+                <!-- Schedule a viewing -->
+                <div class="card border shadow-sm mb-4">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Interested in this property?</h2>
+
+                        @if (isAvailable)
+                        {
+                            <p class="small text-secondary mb-3">
+                                Send a viewing request with your preferred date and time.
+                            </p>
+                            <div class="d-grid">
+                                <a class="btn btn-success"
+                                   asp-area="Client"
+                                   asp-controller="Appointment"
+                                   asp-action="Create"
+                                   asp-route-propertyId="@p.Id">
+                                    <i class="bi bi-calendar-check me-1"></i>Schedule a viewing
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="small text-secondary mb-0">
+                                This property is currently @p.Status.ToLowerInvariant() and is not accepting viewing requests.
+                            </p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Listed by -->
                 <div class="card border shadow-sm mb-4">
                     <div class="card-body">
                         <h2 class="h5 mb-3">Listed by</h2>
@@ -146,12 +178,6 @@
                                 <div>
                                     <div class="fw-semibold">@a.FullName</div>
                                     <div class="small text-secondary">@a.Role</div>
-                                    @if (!string.IsNullOrWhiteSpace(a.LicenseNumber))
-                                    {
-                                        <span class="badge text-bg-primary mt-1">
-                                            <i class="bi bi-patch-check-fill me-1"></i>Verified
-                                        </span>
-                                    }
                                 </div>
                             </div>
 
@@ -179,7 +205,7 @@
                             </ul>
 
                             <div class="d-grid gap-2">
-                                <a class="btn btn-success"
+                                <a class="btn btn-outline-success"
                                    href="mailto:@a.Email?subject=Inquiry about @p.Title">
                                     <i class="bi bi-envelope me-1"></i>Contact agent
                                 </a>
