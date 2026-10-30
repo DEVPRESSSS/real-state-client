@@ -1,161 +1,375 @@
 ﻿@using REAL_STATE.Models.VM
 @model PagedAgentsVM
+
 @{
-    ViewData["Title"] = "Our advisors";
+    ViewData["Title"] = "Agents and brokers";
 
     var start = Math.Max(1, Model.Page - 2);
     var end = Math.Min(Model.TotalPages, start + 4);
     start = Math.Max(1, end - 4);
+
+    const string pageBase = "inline-flex min-w-10 items-center justify-center border border-ice bg-white px-3 py-2 text-sm text-navy transition-colors hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+    const string pageActive = "inline-flex min-w-10 items-center justify-center border border-azure bg-azure px-3 py-2 text-sm font-medium text-white";
+    const string pageDisabled = "inline-flex min-w-10 items-center justify-center border border-ice bg-ice px-3 py-2 text-sm text-navy/40";
 }
 
-<section class="bg-white border-bottom py-5">
-    <div class="container-xxl">
-        <h1 class="display-3 fw-semibold text-primary-emphasis mb-3" style="font-family:'Playfair Display',serif;">
-            Meet our advisors
-        </h1>
-        <p class="text-secondary mb-0">
-            Local expertise, honest guidance, and relationships built for the long term.
-        </p>
-    </div>
-</section>
+    <!-- Page Header: Same alignment as Developers -->
+    <section class="py-12">
+        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 
-<section class="py-5">
-    <div class="container-xxl">
+            <h1 class="mb-3 font-display text-3xl font-semibold text-navy md:text-4xl">
+                Meet our agents and brokers
+            </h1>
 
-        @if (Model.Agents.Any())
-        {
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
-                @foreach (var a in Model.Agents)
-                {
-                    <div class="col">
-                        <article class="card h-100 border-0 rounded-0 shadow-sm">
+            <p class="text-navy/60">
+                Local expertise, honest guidance, and relationships built for the long term.
+            </p>
 
-                            <div class="ratio" style="--bs-aspect-ratio:110%;">
+        </div>
+    </section>
+
+    <!-- Agents Listing: Same alignment as Developers -->
+    <section class="pb-12">
+        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+
+            @if (Model.Agents != null && Model.Agents.Any())
+            {
+                <!-- Agent Cards -->
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+
+                    @foreach (var a in Model.Agents)
+                    {
+                        <article class="flex h-full flex-col overflow-hidden rounded-lg border border-ice bg-white shadow-sm">
+
+                            <!-- Agent Photo -->
+                            <div class="aspect-[10/11] w-full bg-ice">
+
                                 @if (!string.IsNullOrWhiteSpace(a.PhotoUrl))
                                 {
-                                    <img src="@a.PhotoUrl" alt="@a.FullName" loading="lazy"
-                                         class="object-fit-cover w-100 h-100" style="object-position:top;" />
+                                    <img src="@a.PhotoUrl"
+                                         alt="@a.FullName"
+                                         loading="lazy"
+                                         class="size-full object-cover object-top" />
                                 }
                                 else
                                 {
-                                    <div class="d-flex align-items-center justify-content-center text-primary">
-                                        <i class="bi bi-person-fill display-1"></i>
+                                    <div class="flex size-full items-center justify-center text-navy/40"
+                                         aria-hidden="true">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="size-20"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="1.3">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0" />
+                                        </svg>
+
                                     </div>
                                 }
+
                             </div>
 
-                            <div class="card-body d-flex flex-column">
+                            <!-- Agent Details -->
+                            <div class="flex flex-1 flex-col p-4">
+
+                                <!-- Verification Badge -->
                                 <div class="mb-2">
+
                                     @if (a.IsVerified)
                                     {
-                                        <span class="badge text-bg-primary text-uppercase">
-                                            <i class="bi bi-patch-check-fill me-1"></i>Verified advisor
+                                        <span class="inline-flex items-center gap-1 rounded bg-ice px-2 py-1 text-xs font-semibold uppercase tracking-wide text-navy">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="size-3.5"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke="currentColor"
+                                                 stroke-width="2.5"
+                                                 aria-hidden="true">
+                                                <path stroke-linecap="round"
+                                                      stroke-linejoin="round"
+                                                      d="m5 13 4 4L19 7" />
+                                            </svg>
+
+                                            Verified
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge text-success text-uppercase">Advisor</span>
+                                        <span class="text-xs font-semibold uppercase tracking-wide text-azure">
+                                            @a.Role
+                                        </span>
                                     }
+
                                 </div>
 
-                                <h2 class="h5 fw-medium text-primary-emphasis mb-1" style="font-family:'Playfair Display',serif;">
+                                <!-- Name -->
+                                <h2 class="mb-1 break-words font-display text-xl font-medium text-navy">
                                     @a.FullName
                                 </h2>
-                                <div class="small text-secondary mb-3">@a.Role</div>
 
-                                <ul class="list-group list-group-flush small mb-3">
-                                    <li class="list-group-item d-flex justify-content-between gap-2 px-0">
-                                        <span class="text-secondary">Area</span>
-                                        <span class="text-end">@a.Area</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between gap-2 px-0">
-                                        <span class="text-secondary">Listings</span>
-                                        <span class="text-end">@a.ActiveListings active</span>
-                                    </li>
-                                </ul>
+                                <p class="mb-4 text-sm text-navy/60">
+                                    @a.Role
+                                </p>
 
+                                <!-- Agent Information -->
+                                <dl class="mb-4 divide-y divide-ice border-y border-ice text-sm">
+
+                                    <div class="flex justify-between gap-2 py-3">
+                                        <dt class="text-navy/60">Area</dt>
+                                        <dd class="text-right font-medium text-navy">
+                                            @a.Area
+                                        </dd>
+                                    </div>
+
+                                    <div class="flex justify-between gap-2 py-3">
+                                        <dt class="text-navy/60">Listings</dt>
+                                        <dd class="text-right font-medium text-navy">
+                                            @a.ActiveListings active
+                                        </dd>
+                                    </div>
+
+                                </dl>
+
+                                <!-- Contact -->
                                 @if (!string.IsNullOrWhiteSpace(a.Email))
                                 {
-                                    <a class="btn btn-primary rounded-0 mt-auto"
-                                       href="mailto:@a.Email?subject=Inquiry for @a.FullName">
-                                        Contact advisor <i class="bi bi-arrow-up-right ms-1"></i>
+                                    <a href="mailto:@a.Email?subject=@Uri.EscapeDataString("Inquiry for " + a.FullName)"
+                                       class="mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-azure px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+
+                                        Contact
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="size-4"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             aria-hidden="true">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M7 17 17 7M8 7h9v9" />
+                                        </svg>
+
                                     </a>
                                 }
                                 else
                                 {
-                                    <button type="button" class="btn btn-secondary rounded-0 mt-auto" disabled>
-                                        Contact advisor
+                                    <button type="button"
+                                            disabled
+                                            class="mt-auto cursor-not-allowed rounded-lg border border-ice bg-ice px-4 py-2.5 text-sm font-medium text-navy/50">
+                                        Contact
                                     </button>
                                 }
+
                             </div>
+
                         </article>
-                    </div>
+                    }
+
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="mt-12" aria-label="Agents and brokers pagination">
+
+                        <ul class="mb-4 flex flex-wrap items-center justify-center gap-1">
+
+                            <!-- Previous -->
+                            <li>
+                                @if (Model.Page == 1)
+                                {
+                                    <span class="@pageDisabled rounded-l-lg" aria-disabled="true">
+                                        <span class="sr-only">Previous</span>
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="size-4"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             aria-hidden="true">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="m15 18-6-6 6-6" />
+                                        </svg>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a class="@pageBase rounded-l-lg"
+                                       asp-controller="Agents"
+                                       asp-action="Index"
+                                       asp-route-page="@(Model.Page - 1)"
+                                       aria-label="Previous">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="size-4"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             aria-hidden="true">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="m15 18-6-6 6-6" />
+                                        </svg>
+
+                                    </a>
+                                }
+                            </li>
+
+                            <!-- First Page -->
+                            @if (start > 1)
+                            {
+                                <li>
+                                    <a class="@pageBase"
+                                       asp-controller="Agents"
+                                       asp-action="Index"
+                                       asp-route-page="1">
+                                        1
+                                    </a>
+                                </li>
+
+                                @if (start > 2)
+                                {
+                                    <li>
+                                        <span class="@pageDisabled">&hellip;</span>
+                                    </li>
+                                }
+                            }
+
+                            <!-- Page Numbers -->
+                            @for (var i = start; i <= end; i++)
+                            {
+                                <li>
+                                    @if (i == Model.Page)
+                                    {
+                                        <span class="@pageActive" aria-current="page">
+                                            @i
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <a class="@pageBase"
+                                           asp-controller="Agents"
+                                           asp-action="Index"
+                                           asp-route-page="@i">
+                                            @i
+                                        </a>
+                                    }
+                                </li>
+                            }
+
+                            <!-- Last Page -->
+                            @if (end < Model.TotalPages)
+                            {
+                                @if (end < Model.TotalPages - 1)
+                                {
+                                    <li>
+                                        <span class="@pageDisabled">&hellip;</span>
+                                    </li>
+                                }
+
+                                <li>
+                                    <a class="@pageBase"
+                                       asp-controller="Agents"
+                                       asp-action="Index"
+                                       asp-route-page="@Model.TotalPages">
+                                        @Model.TotalPages
+                                    </a>
+                                </li>
+                            }
+
+                            <!-- Next -->
+                            <li>
+                                @if (Model.Page == Model.TotalPages)
+                                {
+                                    <span class="@pageDisabled rounded-r-lg" aria-disabled="true">
+                                        <span class="sr-only">Next</span>
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="size-4"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             aria-hidden="true">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="m9 18 6-6-6-6" />
+                                        </svg>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a class="@pageBase rounded-r-lg"
+                                       asp-controller="Agents"
+                                       asp-action="Index"
+                                       asp-route-page="@(Model.Page + 1)"
+                                       aria-label="Next">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="size-4"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             aria-hidden="true">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="m9 18 6-6-6-6" />
+                                        </svg>
+
+                                    </a>
+                                }
+                            </li>
+
+                        </ul>
+
+                        <p class="text-center text-sm text-navy/60">
+                            Showing
+                            @(((Model.Page - 1) * Model.PageSize) + 1)&ndash;@(Math.Min(Model.Page * Model.PageSize, Model.TotalItems))
+                            of @Model.TotalItems agents and brokers
+                        </p>
+
+                    </nav>
                 }
-            </div>
-
-            @if (Model.TotalPages > 1)
-            {
-                <nav class="mt-5" aria-label="Advisors pagination">
-                    <ul class="pagination justify-content-center mb-2">
-                        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-controller="Agents" asp-action="Index"
-                               asp-route-page="@(Model.Page - 1)" aria-label="Previous">
-                                <i class="bi bi-chevron-left"></i>
-                            </a>
-                        </li>
-
-                        @if (start > 1)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" asp-controller="Agents" asp-action="Index" asp-route-page="1">1</a>
-                            </li>
-                            @if (start > 2)
-                            {
-                                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
-                            }
-                        }
-
-                        @for (var i = start; i <= end; i++)
-                        {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" asp-controller="Agents" asp-action="Index"
-                                   asp-route-page="@i">@i</a>
-                            </li>
-                        }
-
-                        @if (end < Model.TotalPages)
-                        {
-                            @if (end < Model.TotalPages - 1)
-                            {
-                                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
-                            }
-                            <li class="page-item">
-                                <a class="page-link" asp-controller="Agents" asp-action="Index"
-                                   asp-route-page="@Model.TotalPages">@Model.TotalPages</a>
-                            </li>
-                        }
-
-                        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-controller="Agents" asp-action="Index"
-                               asp-route-page="@(Model.Page + 1)" aria-label="Next">
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <p class="text-center small text-secondary mb-0">
-                        Showing @(((Model.Page - 1) * Model.PageSize) + 1)&ndash;@(Math.Min(Model.Page * Model.PageSize, Model.TotalItems))
-                        of @Model.TotalItems advisors
-                    </p>
-                </nav>
             }
-        }
-        else
-        {
-            <div class="text-center py-5 text-secondary">
-                <i class="bi bi-people display-4"></i>
-                <p class="mt-2 mb-0">No advisors available yet.</p>
-            </div>
-        }
-    </div>
-</section>
+            else
+            {
+                <!-- Empty State -->
+                <div class="rounded-lg border border-ice bg-white py-16 text-center">
+
+                    <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-ice text-navy/50">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="size-8"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
+                             stroke-width="1.5"
+                             aria-hidden="true">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0" />
+                        </svg>
+                    </div>
+
+                    <h2 class="mb-2 font-display text-xl font-semibold text-navy">
+                        No agents or brokers available
+                    </h2>
+
+                    <p class="text-sm text-navy/60">
+                        No agents or brokers available yet.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+    </section>
+

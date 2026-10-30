@@ -2,70 +2,83 @@
 @model AgentRegisterVM
 @{
     ViewData["Title"] = "Become an advisor";
+
+    const string inputCls = "block w-full rounded border border-ice bg-white px-3 py-2.5 text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30";
+    const string labelCls = "mb-1 block text-sm font-medium text-navy";
+    const string errCls = "mt-1 block text-sm text-red-700";
 }
 
-<div class="container py-5" style="max-width: 760px;">
-    <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Become an advisor</h1>
-    <p class="text-secondary mb-4">Create your account and profile. An admin reviews every application.</p>
+<div class="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-3xl">
 
-    <form asp-controller="Home" asp-action="Register" method="post" novalidate>
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="mb-6">
+            <h1 class="mb-1 font-display text-3xl font-semibold text-navy md:text-4xl">Become an advisor</h1>
+            <p class="text-navy/60">Create your account and profile. An admin reviews every application.</p>
+        </div>
 
-        <div class="card border shadow-sm mb-4">
-            <div class="card-body">
-                <h2 class="h5 mb-3">Your details</h2>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label asp-for="FullName" class="form-label"></label>
-                        <input asp-for="FullName" class="form-control" />
-                        <span asp-validation-for="FullName" class="text-danger small"></span>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" type="email" class="form-control" autocomplete="email" />
-                        <span asp-validation-for="Email" class="text-danger small"></span>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label asp-for="Phone" class="form-label"></label>
-                        <input asp-for="Phone" type="tel" class="form-control" />
-                        <span asp-validation-for="Phone" class="text-danger small"></span>
-                    </div>
-                    <div class="col-12">
-                        <label asp-for="LicenseNumber" class="form-label"></label>
-                        <input asp-for="LicenseNumber" class="form-control" />
-                        <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
-                    </div>
-                    <div class="col-12">
-                        <label asp-for="Bio" class="form-label"></label>
-                        <textarea asp-for="Bio" class="form-control" rows="4"></textarea>
-                        <span asp-validation-for="Bio" class="text-danger small"></span>
-                    </div>
+        <form asp-controller="Home" asp-action="Register" method="post" novalidate
+              class="rounded-lg border border-ice bg-white p-6 shadow-sm md:p-8">
+
+            <div asp-validation-summary="ModelOnly" class="mb-4 text-sm text-red-700" role="alert"></div>
+
+            <h2 class="mb-4 text-lg font-medium text-navy">Your details</h2>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="md:col-span-2">
+                    <label asp-for="FullName" class="@labelCls"></label>
+                    <input asp-for="FullName" class="@inputCls" autocomplete="name" />
+                    <span asp-validation-for="FullName" class="@errCls"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Email" class="@labelCls"></label>
+                    <input asp-for="Email" type="email" class="@inputCls" autocomplete="email" />
+                    <span asp-validation-for="Email" class="@errCls"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Phone" class="@labelCls"></label>
+                    <input asp-for="Phone" type="tel" class="@inputCls" autocomplete="tel" />
+                    <span asp-validation-for="Phone" class="@errCls"></span>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label asp-for="LicenseNumber" class="@labelCls"></label>
+                    <input asp-for="LicenseNumber" class="@inputCls" />
+                    <span asp-validation-for="LicenseNumber" class="@errCls"></span>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label asp-for="Bio" class="@labelCls"></label>
+                    <textarea asp-for="Bio" class="@inputCls" rows="4"></textarea>
+                    <span asp-validation-for="Bio" class="@errCls"></span>
                 </div>
             </div>
-        </div>
 
-        <div class="card border shadow-sm mb-4">
-            <div class="card-body">
-                <h2 class="h5 mb-3">Password</h2>
-                <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" type="password" class="form-control" autocomplete="new-password" />
-                        <span asp-validation-for="Password" class="text-danger small"></span>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                    </div>
+            <hr class="my-6 border-ice" />
+
+            <h2 class="mb-4 text-lg font-medium text-navy">Password</h2>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label asp-for="Password" class="@labelCls"></label>
+                    <input asp-for="Password" type="password" class="@inputCls" autocomplete="new-password" />
+                    <span asp-validation-for="Password" class="@errCls"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ConfirmPassword" class="@labelCls"></label>
+                    <input asp-for="ConfirmPassword" type="password" class="@inputCls" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="@errCls"></span>
                 </div>
             </div>
-        </div>
 
-        <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Submit application</button>
-        </div>
-    </form>
+            <button type="submit"
+                    class="mt-8 w-full bg-azure px-4 py-3 text-lg font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+                Submit application
+            </button>
+        </form>
+    </div>
 </div>
 
 @section Scripts {

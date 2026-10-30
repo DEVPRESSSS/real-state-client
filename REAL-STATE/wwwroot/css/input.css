@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+@theme {
+    --font-sans: "Poppins", sans-serif;
+    --color-navy: #1B1B2F;
+    --color-azure: #3F72AF;
+    --color-azure-dark: #2F5A8E; /* derived: hover */
+    --color-azure-darker: #274C78; /* derived: pressed */
+    --color-ice: #DBE2EF;
+    --color-snow: #F9F7F7;
+}

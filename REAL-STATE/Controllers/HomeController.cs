@@ -25,7 +25,16 @@ namespace REAL_STATE.Controllers
             _agentService = agentService;
             _developerService= developerService;
         }
-    
+        public async Task<IActionResult> Hero()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> Privacy()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Index([FromQuery] CriteriaDTO criteria)
         {
             var properties = await _propertyService.Filter(criteria);
