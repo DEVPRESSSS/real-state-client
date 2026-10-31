@@ -2,85 +2,77 @@
 @model IEnumerable<Property>
 @{
     ViewData["Title"] = "Properties";
+
+    const string btnPrimary = "";
+
+    var rows = (Model ?? Enumerable.Empty<Property>()).Select(p => new
+    {
+        id = p.Id,
+        title = p.Title,
+        propertyType = p.PropertyType,
+        listingType = p.ListingType,
+        price = p.Price,
+        city = p.City,
+        developer = p.Developer?.Name ?? "",
+        status = p.Status,
+        featured = p.IsFeatured,
+        editUrl = Url.Action("Upsert", "Property", new { area = "Admin", id = p.Id })
+    }).ToList();
 }
+
 
 @Html.AntiForgeryToken()
 
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Properties</h1>
-        <p class="text-secondary mb-0">Manage all property listings.</p>
+        <h1 class="mb-1 font-display text-3xl font-semibold text-navy">Properties</h1>
+        <p class="text-navy/60">Manage all property listings.</p>
     </div>
-    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="btn btn-outline-primary">
-        <i class="bi bi-plus-lg me-1"></i>Create
+    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" 
+          class="inline-flex items-center rounded-md gap-2 bg-azure px-4 py-2 
+            font-medium text-white transition-colors hover:bg-azure-dark 
+            active:bg-azure-darker focus:outline-none focus-visible:ring-2 
+            focus-visible:ring-azure focus-visible:ring-offset-2">
+        <i data-lucide="plus" class="size-4" aria-hidden="true"></i>Create
     </a>
 </div>
 
-@if (Model != null && Model.Any())
+@if (rows.Any())
 {
-    <div class="card border shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="propertyTable" class="table table-hover align-middle w-100">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Listing</th>
-                            <th>Price</th>
-                            <th>City</th>
-                            <th>Developer</th>
-                            <th>Status</th>
-                            <th>Featured</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var property in Model)
-                        {
-                            <tr>
-                                <td class="fw-semibold">@property.Title</td>
-                                <td>@property.PropertyType</td>
-                                <td>@property.ListingType</td>
-                                <td data-order="@property.Price">₱@property.Price.ToString("N2")</td>
-                                <td>@property.City</td>
-                                <td>@property.Developer?.Name</td>
-                                <td>@property.Status</td>
-                                <td>@(property.IsFeatured ? "Yes" : "No")</td>
-                                <td class="text-end text-nowrap">
-                                    <a asp-area="Admin" asp-controller="Property" asp-action="Upsert"
-                                       asp-route-id="@property.Id"
-                                       class="btn btn-sm btn-primary">
-                                        <i class="bi bi-pencil-square me-1"></i>Edit
-                                    </a>
+    <div class="rounded-lg border border-ice bg-white p-4 shadow-sm md:p-5">
 
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger js-delete"
-                                            data-id="@property.Id"
-                                            data-title="@property.Title">
-                                        <i class="bi bi-trash me-1"></i>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="w-full sm:w-72">
+                <label for="propertySearch" class="sr-only">Search properties</label>
+                <div class="relative">
+                    <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-navy/50" aria-hidden="true"></i>
+                    <input id="propertySearch" type="search" placeholder="Search properties"
+                           class="block w-full rounded border border-ice bg-white py-2 pl-9 pr-3 text-sm text-navy
+                        placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
+                </div>
             </div>
+            <p id="propertyCount" class="text-sm text-navy/60" aria-live="polite"></p>
         </div>
+
+        <div id="propertyTable"></div>
     </div>
 }
 else
 {
-    <div class="text-center bg-white border rounded p-5">
-        <h2 class="h5">No properties yet</h2>
-        <p class="text-secondary">Add your first property to see it listed here.</p>
-        <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="btn btn-success">
-            Add property
-        </a>
+    <div class="rounded-lg border border-ice bg-white p-12 text-center">
+        <h2 class="mb-1 font-display text-lg font-semibold text-navy">No properties yet</h2>
+        <p class="mb-4 text-navy/60">Add your first property to see it listed here.</p>
+        <a asp-area="Admin" asp-controller="Property" asp-action="Upsert" class="@btnPrimary">Add property</a>
     </div>
 }
 
 @section Scripts {
-    <script src="/js/property.js"></script>
-      
+
+    @if (rows.Any())
+    {
+        <script id="propertyData" type="application/json">@Html.Raw(Json.Serialize(rows))</script>
+        <script src="~/js/property-table.js" asp-append-version="true"></script>
+    }
+
+    <script src="~/js/property.js" asp-append-version="true"></script>
 }
