@@ -12,7 +12,7 @@
     }
 
     var badge = 'inline-flex rounded bg-ice px-2 py-0.5 text-xs font-medium text-navy';
-    var badgeSuccess = 'inline-flex rounded bg-green-700 px-2 py-0.5 text-xs font-medium text-white';
+    var badgeAvailable = 'inline-flex rounded bg-azure px-2 py-0.5 text-xs font-medium text-white';
     var badgeOutline = 'inline-flex rounded border border-azure bg-white px-2 py-0.5 text-xs font-medium text-azure';
 
     var table = new Tabulator('#propertyTable', {
@@ -51,7 +51,7 @@
             {
                 title: 'Status', field: 'status',
                 formatter: function (cell) {
-                    return '<span class="' + badgeSuccess + '">' + esc(cell.getValue()) + '</span>';
+                    return '<span class="' + badgeAvailable + '">' + esc(cell.getValue()) + '</span>';
                 }
             },
             {

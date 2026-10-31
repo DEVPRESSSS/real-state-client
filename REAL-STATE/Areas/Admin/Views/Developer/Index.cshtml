@@ -1,111 +1,78 @@
 ﻿@using REAL_STATE.Models
 @model IEnumerable<Developers>
+
 @{
     ViewData["Title"] = "Developers";
+
+    const string btnPrimary = "inline-flex items-center gap-2 bg-azure px-4 py-2 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+
+    var rows = (Model ?? Enumerable.Empty<Developers>()).Select(d => new
+    {
+        id = d.Id,
+        developer = d.Name,
+        slug = d.Slug,
+        website = d.WebsiteUrl,
+        status = d.IsActive ? "Active" : "Inactive",
+        created = d.CreatedAt.ToString("MMM dd, yyyy"),
+        createdTicks = d.CreatedAt.Ticks,
+        logoUrl = d.LogoUrl,
+        editUrl = Url.Action("Upsert", "Developer", new { area = "Admin", id = d.Id })
+    }).ToList();
 }
 
 @Html.AntiForgeryToken()
 
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Developers</h1>
-        <p class="text-secondary mb-0">Manage property developers.</p>
+        <h1 class="mb-1 font-display text-3xl font-semibold text-navy">Developers</h1>
+        <p class="text-navy/60">Manage all property developers.</p>
     </div>
-    <a asp-area="Admin" asp-controller="Developer" asp-action="Upsert" class="btn btn-outline-primary">
-        <i class="bi bi-plus-lg me-1"></i>Create
+    <a asp-area="Admin" asp-controller="Developer" asp-action="Upsert" class="@btnPrimary">
+        <i data-lucide="plus" class="size-4" aria-hidden="true"></i>Create
     </a>
 </div>
 
-@if (Model != null && Model.Any())
+@if (rows.Any())
 {
-    <div class="card border shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="developerTable" class="table table-hover align-middle w-100">
-                    <thead>
-                        <tr>
-                            <th>Developer</th>
-                            <th>Slug</th>
-                            <th>Website</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var developer in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        @if (!string.IsNullOrWhiteSpace(developer.LogoUrl))
-                                        {
-                                            <img src="@developer.LogoUrl" alt="" class="rounded object-fit-contain border bg-white"
-                                                 style="width:36px;height:36px;" />
-                                        }
-                                        else
-                                        {
-                                            <span class="rounded bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center fw-semibold"
-                                                  style="width:36px;height:36px;">
-                                                @(string.IsNullOrWhiteSpace(developer.Name) ? "?" : developer.Name.Trim()[0].ToString().ToUpper())
-                                            </span>
-                                        }
-                                        <span class="fw-semibold">@developer.Name</span>
-                                    </div>
-                                </td>
-                                <td>@developer.Slug</td>
-                                <td>
-                                    @if (!string.IsNullOrWhiteSpace(developer.WebsiteUrl))
-                                    {
-                                        <a href="@developer.WebsiteUrl" target="_blank" rel="noopener noreferrer">
-                                            <i class="bi bi-box-arrow-up-right me-1"></i>Visit
-                                        </a>
-                                    }
-                                </td>
-                                <td>
-                                    @if (developer.IsActive)
-                                    {
-                                        <span class="badge text-bg-success">Active</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge text-bg-secondary">Inactive</span>
-                                    }
-                                </td>
-                                <td data-order="@developer.CreatedAt.Ticks">@developer.CreatedAt.ToString("MMM dd, yyyy")</td>
-                                <td class="text-end text-nowrap">
-                                    <a asp-area="Admin" asp-controller="Developer" asp-action="Upsert"
-                                       asp-route-id="@developer.Id"
-                                       class="btn btn-sm btn-primary">
-                                        <i class="bi bi-pencil-square me-1"></i>Edit
-                                    </a>
+    <div class="rounded-lg border border-ice bg-white p-4 shadow-sm md:p-5">
 
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger js-delete"
-                                            data-id="@developer.Id"
-                                            data-title="@developer.Name">
-                                        <i class="bi bi-trash me-1"></i>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="w-full sm:w-72">
+                <label for="developerSearch" class="sr-only">Search developers</label>
+                <div class="relative">
+                    <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-navy/50" aria-hidden="true"></i>
+                    <input id="developerSearch" type="search" placeholder="Search developers"
+                           class="block w-full rounded border border-ice bg-white py-2 pl-9 pr-3 text-sm text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
+                </div>
             </div>
+            <p id="developerCount" class="text-sm text-navy/60" aria-live="polite"></p>
         </div>
+
+        <div id="developerTable"></div>
     </div>
 }
 else
 {
-    <div class="text-center bg-white border rounded p-5">
-        <h2 class="h5">No developers yet</h2>
-        <p class="text-secondary">Add your first developer to see it listed here.</p>
-        <a asp-area="Admin" asp-controller="Developer" asp-action="Upsert" class="btn btn-success">
-            Add developer
+    <div class="rounded-lg border border-ice bg-white p-12 text-center">
+        <div class="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-ice">
+            <i data-lucide="building-2" class="size-6 text-azure" aria-hidden="true"></i>
+        </div>
+        <h2 class="mb-1 font-display text-lg font-semibold text-navy">No developers yet</h2>
+        <p class="mb-4 text-navy/60">Add your first developer to see it listed here.</p>
+        <a asp-area="Admin" asp-controller="Developer" asp-action="Upsert" class="@btnPrimary">
+            <i data-lucide="plus" class="size-4" aria-hidden="true"></i>Add developer
         </a>
     </div>
 }
 
 @section Scripts {
-    <script src="/js/developer.js"></script>
+    <script src="~/lib/tabulator/tabulator.min.js"></script>
+
+    @if (rows.Any())
+    {
+        <script id="developerData" type="application/json">@Html.Raw(Json.Serialize(rows))</script>
+        <script src="~/js/developer-table.js" asp-append-version="true"></script>
+    }
+
+    <script src="~/js/developer.js" asp-append-version="true"></script>
 }
