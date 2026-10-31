@@ -24,5 +24,10 @@ namespace REAL_STATE.Services.Interfaces
         /// </summary>
         Task<CreateAppointmentResultDTO> CreateAsync(
             ScheduleAppointmentVM vm, ClaimsPrincipal user, bool inputIsValid);
+
+        Task<PagedResult<AppointmentListVM>> GetAppointmentsAsync(
+           int page,
+           int pageSize
+       );
     }
 }

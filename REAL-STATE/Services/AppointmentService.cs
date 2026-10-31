@@ -4,6 +4,7 @@ using REAL_STATE.Data;
 using REAL_STATE.Models;
 using REAL_STATE.Models.DTO.AppointmentDTO;
 using REAL_STATE.Models.VM;
+using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services.Interfaces;
 using System.Security.Claims;
 
@@ -11,13 +12,17 @@ namespace REAL_STATE.Services
 {
     public class AppointmentService : IAppointmentService
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IPropertyRepository _propertyRepository;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppointmentService(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+        public AppointmentService(IAppointmentRepository appointmentRepository, 
+            UserManager<ApplicationUser> userManager,
+            IPropertyRepository propertyRepository)
         {
-            _db = db;
+            _appointmentRepository = appointmentRepository;
             _userManager = userManager;
+            _propertyRepository = propertyRepository;
         }
 
         public async Task<ScheduleAppointmentVM?> GetFormAsync(string propertyId, ClaimsPrincipal user)
@@ -101,8 +106,8 @@ namespace REAL_STATE.Services
                 Status = "Pending"
             };
 
-            _db.ViewingAppointments.Add(appointment);
-            await _db.SaveChangesAsync();
+             await _appointmentRepository.AddAsync(appointment);
+            await _appointmentRepository.Save();
 
             return new CreateAppointmentResultDTO
             {
@@ -113,12 +118,14 @@ namespace REAL_STATE.Services
 
         // ---------- helpers ----------
 
-        private Task<Property?> LoadPropertyAsync(string propertyId) =>
-            _db.Properties
-               .AsNoTracking()
-               .Include(p => p.Images)
-               .Include(p => p.Agent)
-               .FirstOrDefaultAsync(p => p.Id == propertyId);
+        private async Task<Property?> LoadPropertyAsync(string propertyId) =>
+
+                        await _propertyRepository.GetAsync(x => x.Id == propertyId, includeProperties: "Images,Agent");
+        //_db.Properties
+        //   .AsNoTracking()
+        //   .Include(p => p.Images)
+        //   .Include(p => p.Agent)
+        //   .FirstOrDefaultAsync(p => p.Id == propertyId);
 
         private static void FillPropertySummary(ScheduleAppointmentVM vm, Property p)
         {
@@ -133,6 +140,11 @@ namespace REAL_STATE.Services
             vm.PrimaryImageUrl = image?.ImageUrl;
             vm.PrimaryImageAlt = image?.AltText ?? p.Title;
             vm.AgentName = p.Agent?.FullName;
+        }
+
+        public Task<PagedResult<AppointmentListVM>> GetAppointmentsAsync(int page, int pageSize)
+        {
+            throw new NotImplementedException();
         }
     }
 }

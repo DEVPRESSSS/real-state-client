@@ -217,10 +217,12 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a class="@NavClass("")"
-                               title="Application logs"
-                               href="#">
+                        @* <li>
+                            <a class="@NavClass("Appointment")"
+                               title="Appointments"
+                               asp-area="Admin"
+                               asp-controller="Appointment"
+                               asp-action="Index">
 
                                 <i data-lucide="notebook-text"
                                    class="@iconCls"
@@ -228,12 +230,14 @@
 
                                 <span class="@labelCls">Logs</span>
                             </a>
-                        </li>
+                        </li> *@
 
                         <li>
-                            <a class="@NavClass("")"
+                            <a class="@NavClass("Appointment")"
                                title="Appointments"
-                               href="#">
+                               asp-area="Admin"
+                               asp-controller="Appointment"
+                               asp-action="Index">
 
                                 <i data-lucide="calendar-check"
                                    class="@iconCls"

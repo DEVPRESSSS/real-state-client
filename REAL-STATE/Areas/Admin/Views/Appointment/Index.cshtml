@@ -1,0 +1,136 @@
+﻿@using REAL_STATE.Models
+@model IEnumerable<ViewingAppointment>
+
+@{
+    ViewData["Title"] = "Viewing Appointments";
+
+    var rows = (Model ?? Enumerable.Empty<ViewingAppointment>())
+        .Select(a => new
+        {
+            id = a.Id,
+
+            propertyId = a.PropertyId,
+            property = a.Property?.Title ?? "Unknown Property",
+
+            contactName = a.ContactName,
+            email = a.ContactEmail,
+            phone = a.ContactPhone ?? "",
+
+            agentId = a.AgentId,
+            agent = a.Agent?.FullName ?? "Unassigned",
+
+            scheduledAt = a.ScheduledAt.ToString("MMM dd, yyyy hh:mm tt"),
+            scheduledTicks = a.ScheduledAt.Ticks,
+
+            status = a.Status,
+
+            notes = a.Notes ?? "",
+
+            createdAt = a.CreatedAt.ToString("MMM dd, yyyy"),
+            createdTicks = a.CreatedAt.Ticks
+        })
+        .ToList();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
+    <link rel="stylesheet"
+          href="~/css/tabulator-theme.css"
+          asp-append-version="true" />
+}
+
+@Html.AntiForgeryToken()
+
+<!-- Page Header -->
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+
+    <div>
+        <h1 class="mb-1 font-display text-3xl font-semibold text-navy">
+            Viewing Appointments
+        </h1>
+
+        <p class="text-navy/60">
+            Manage property viewing requests and scheduled appointments.
+        </p>
+    </div>
+
+</div>
+
+<!-- Appointments Table -->
+@if (rows.Any())
+{
+    <div class="rounded-lg border border-ice bg-white p-4 shadow-sm md:p-5">
+
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+
+            <!-- Search -->
+            <div class="w-full sm:w-72">
+
+                <label for="appointmentSearch" class="sr-only">
+                    Search appointments
+                </label>
+
+                <div class="relative">
+
+                    <i data-lucide="search"
+                       class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-navy/50"
+                       aria-hidden="true"></i>
+
+                    <input id="appointmentSearch"
+                           type="search"
+                           placeholder="Search appointments"
+                           class="block w-full rounded border border-ice bg-white py-2 pl-9 pr-3 text-sm text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
+
+                </div>
+            </div>
+
+            <!-- Count -->
+            <p id="appointmentCount"
+               class="text-sm text-navy/60"
+               aria-live="polite">
+            </p>
+
+        </div>
+
+        <!-- Tabulator -->
+        <div id="appointmentTable"></div>
+
+    </div>
+}
+else
+{
+    <div class="rounded-lg border border-ice bg-white p-12 text-center">
+
+        <div class="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-ice">
+
+            <i data-lucide="calendar-days"
+               class="size-6 text-azure"
+               aria-hidden="true"></i>
+
+        </div>
+
+        <h2 class="mb-1 font-display text-lg font-semibold text-navy">
+            No viewing appointments yet
+        </h2>
+
+        <p class="text-navy/60">
+            Viewing requests submitted by customers will appear here.
+        </p>
+
+    </div>
+}
+
+@section Scripts {
+
+    <script src="~/lib/tabulator/tabulator.min.js"></script>
+
+    @if (rows.Any())
+    {
+        <script id="appointmentData" type="application/json">
+            @Html.Raw(Json.Serialize(rows))
+        </script>
+
+        <script src="~/js/appointment-table.js"
+                asp-append-version="true"></script>
+    }
+}

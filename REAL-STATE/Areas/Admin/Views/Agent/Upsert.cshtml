@@ -2,125 +2,130 @@
 @model Agent
 @{
     var isEdit = ViewData["IsEdit"] as bool? ?? false;
+
+    const string inputCls = "block w-full rounded border border-ice bg-white px-3 py-2.5 text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30";
+    const string labelCls = "mb-1 block text-sm font-medium text-navy";
+    const string errCls = "mt-1 block text-sm text-red-700";
+    const string card = "mb-6 rounded-lg border border-ice bg-white p-6 shadow-sm";
 }
 
-<div class="container py-4 py-lg-5">
-    <div class="mb-4">
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">
-            @(isEdit ? "Edit agent" : "Add an agent")
-        </h1>
-        <p class="text-secondary mb-0">Fields marked <span class="text-danger">*</span> are required.</p>
-    </div>
+<div class="mb-6">
+    <h1 class="mb-1 font-display text-3xl font-semibold text-navy">
+        @(isEdit ? "Edit agent" : "Add an agent")
+    </h1>
+    <p class="text-navy/60">Fields marked <span class="text-red-700">*</span> are required.</p>
+</div>
 
-    <form asp-area="Admin" asp-controller="Agent" asp-action="Upsert" method="post" novalidate>
-        <input type="hidden" asp-for="Id" />
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+<form asp-area="Admin" asp-controller="Agent" asp-action="Upsert" method="post" novalidate>
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="mb-4 text-sm text-red-700" role="alert"></div>
 
-        <div class="row g-4">
-            <div class="col-12 col-lg-8">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-                <!-- Personal information -->
-                <section class="card border shadow-sm mb-4" aria-labelledby="personal-heading">
-                    <div class="card-body">
-                        <h2 id="personal-heading" class="h5 mb-3">Personal information</h2>
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label asp-for="FullName" class="form-label">Full name <span class="text-danger">*</span></label>
-                                <input asp-for="FullName" class="form-control" maxlength="150"
-                                       placeholder="e.g. Maria Santos" />
-                                <span asp-validation-for="FullName" class="text-danger small"></span>
-                            </div>
+        <div class="lg:col-span-2">
 
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input asp-for="Email" type="email" class="form-control" maxlength="200"
-                                       placeholder="agent@example.com" />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
+            <!-- Personal information -->
+            <section class="@card" aria-labelledby="personal-heading">
+                <h2 id="personal-heading" class="mb-4 font-display text-lg font-semibold text-navy">Personal information</h2>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Phone" class="form-label">Phone</label>
-                                <input asp-for="Phone" type="tel" class="form-control" maxlength="30"
-                                       placeholder="+63 900 000 0000" />
-                                <span asp-validation-for="Phone" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12">
-                                <label asp-for="Bio" class="form-label">Bio</label>
-                                <textarea asp-for="Bio" class="form-control" rows="6" maxlength="2000"
-                                          placeholder="A short introduction shown on the agent's profile."></textarea>
-                                <span asp-validation-for="Bio" class="text-danger small"></span>
-                            </div>
-                        </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="FullName" class="@labelCls">Full name <span class="text-red-700">*</span></label>
+                        <input asp-for="FullName" class="@inputCls" maxlength="150"
+                               autocomplete="name" placeholder="e.g. Maria Santos" />
+                        <span asp-validation-for="FullName" class="@errCls"></span>
                     </div>
-                </section>
 
-                <!-- Professional details -->
-                <section class="card border shadow-sm mb-4" aria-labelledby="pro-heading">
-                    <div class="card-body">
-                        <h2 id="pro-heading" class="h5 mb-3">Professional details</h2>
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <label asp-for="LicenseNumber" class="form-label">License number</label>
-                                <input asp-for="LicenseNumber" class="form-control" maxlength="50" />
-                                <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Role" class="form-label">Role <span class="text-danger">*</span></label>
-                                <select asp-for="Role" class="form-select">
-                                    <option value="Agent">Agent</option>
-                                    <option value="Broker">Broker</option>
-                                </select>
-                                <span asp-validation-for="Role" class="text-danger small"></span>
-                            </div>
-                        </div>
+                    <div>
+                        <label asp-for="Email" class="@labelCls">Email <span class="text-red-700">*</span></label>
+                        <input asp-for="Email" type="email" class="@inputCls" maxlength="200"
+                               autocomplete="email" placeholder="agent@example.com" />
+                        <span asp-validation-for="Email" class="@errCls"></span>
                     </div>
-                </section>
-            </div>
 
-            <!-- Sidebar -->
-            <div class="col-12 col-lg-4">
-                <section class="card border shadow-sm mb-4" aria-labelledby="photo-heading">
-                    <div class="card-body">
-                        <h2 id="photo-heading" class="h5 mb-3">Profile</h2>
-
-                        <div class="text-center mb-3">
-                            @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
-                            {
-                                <img src="@Model.PhotoUrl" alt="Agent photo" class="rounded-circle object-fit-cover"
-                                     style="width:96px;height:96px;" />
-                            }
-                            else
-                            {
-                                <i class="bi bi-person-circle display-3 text-secondary"></i>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="PhotoUrl" class="form-label">Photo URL</label>
-                            <input asp-for="PhotoUrl" class="form-control" maxlength="500"
-                                   placeholder="https://..." />
-                            <span asp-validation-for="PhotoUrl" class="text-danger small"></span>
-                        </div>
-
-                        <div class="form-check form-switch">
-                            <input asp-for="IsActive" class="form-check-input" role="switch" />
-                            <label asp-for="IsActive" class="form-check-label">Active</label>
-                        </div>
+                    <div>
+                        <label asp-for="Phone" class="@labelCls">Phone</label>
+                        <input asp-for="Phone" type="tel" class="@inputCls" maxlength="30"
+                               autocomplete="tel" placeholder="+63 900 000 0000" />
+                        <span asp-validation-for="Phone" class="@errCls"></span>
                     </div>
-                </section>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-lg me-1"></i>Save agent
-                    </button>
-                    <a asp-area="Admin" asp-controller="Agent" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <div class="md:col-span-2">
+                        <label asp-for="Bio" class="@labelCls">Bio</label>
+                        <textarea asp-for="Bio" class="@inputCls" rows="6" maxlength="2000"
+                                  placeholder="A short introduction shown on the agent's profile."></textarea>
+                        <span asp-validation-for="Bio" class="@errCls"></span>
+                    </div>
                 </div>
+            </section>
+
+            <!-- Professional details -->
+            <section class="@card" aria-labelledby="pro-heading">
+                <h2 id="pro-heading" class="mb-4 font-display text-lg font-semibold text-navy">Professional details</h2>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+                    <div>
+                        <label asp-for="LicenseNumber" class="@labelCls">License number</label>
+                        <input asp-for="LicenseNumber" class="@inputCls" maxlength="50" />
+                        <span asp-validation-for="LicenseNumber" class="@errCls"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Role" class="@labelCls">Role <span class="text-red-700">*</span></label>
+                        <select asp-for="Role" class="@inputCls">
+                            <option value="Agent">Agent</option>
+                            <option value="Broker">Broker</option>
+                        </select>
+                        <span asp-validation-for="Role" class="@errCls"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+            <section class="@card" aria-labelledby="photo-heading">
+                <h2 id="photo-heading" class="mb-4 font-display text-lg font-semibold text-navy">Profile</h2>
+
+                <div class="mb-4 flex justify-center">
+                    @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
+                    {
+                        <img src="@Model.PhotoUrl" alt="Agent photo"
+                             class="size-24 rounded-full border border-ice object-cover" />
+                    }
+                    else
+                    {
+                        <span class="inline-flex size-24 items-center justify-center rounded-full bg-ice text-azure" aria-hidden="true">
+                            <i data-lucide="user-round" class="size-10"></i>
+                        </span>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="PhotoUrl" class="@labelCls">Photo URL</label>
+                    <input asp-for="PhotoUrl" class="@inputCls" maxlength="500" placeholder="https://..." />
+                    <span asp-validation-for="PhotoUrl" class="@errCls"></span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input asp-for="IsActive" class="size-4 rounded border-ice accent-azure focus:ring-2 focus:ring-azure" />
+                    <label asp-for="IsActive" class="text-sm text-navy">Active</label>
+                </div>
+            </section>
+
+            <div class="grid gap-2">
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-2 bg-azure px-4 py-3 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+                    <i data-lucide="check" class="size-4" aria-hidden="true"></i>Save agent
+                </button>
+                <a asp-area="Admin" asp-controller="Agent" asp-action="Index"
+                   class="inline-flex items-center justify-center border border-azure px-4 py-3 font-medium text-azure transition-colors hover:bg-azure hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+                    Cancel
+                </a>
             </div>
         </div>
-    </form>
-</div>
+    </div>
+</form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

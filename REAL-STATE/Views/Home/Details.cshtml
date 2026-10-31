@@ -9,263 +9,257 @@
         .Where(x => !string.IsNullOrWhiteSpace(x)));
 
     var isAvailable = string.Equals(p.Status, "Available", StringComparison.OrdinalIgnoreCase);
+    var isRent = p.ListingType == "Rent";
+
+    const string h2 = "mb-4 font-display text-lg font-semibold text-navy";
+    const string badge = "inline-flex items-center gap-1 rounded bg-ice px-2 py-0.5 text-xs font-medium text-navy";
+    const string badgeOutline = "inline-flex items-center gap-1 rounded border border-azure bg-white px-2 py-0.5 text-xs font-medium text-azure";
+    const string badgeSolid = "inline-flex items-center gap-1 rounded bg-azure px-2 py-0.5 text-xs font-medium text-white";
+    const string btnPrimary = "inline-flex w-full items-center justify-center gap-2 bg-azure px-4 py-3 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+    const string btnOutline = "inline-flex w-full items-center justify-center gap-2 border border-azure px-4 py-3 font-medium text-azure transition-colors hover:bg-azure hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+    const string link = "text-azure hover:text-azure-dark hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-azure";
 }
 
-<div class="container py-4 py-lg-5">
+<div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a asp-controller="Home" asp-action="Index" asp-route-listingType="@p.ListingType">
-                    Properties for @(p.ListingType == "Rent" ? "rent" : "sale")
+    <nav aria-label="Breadcrumb" class="mb-6 text-sm">
+        <ol class="flex flex-wrap items-center gap-2 text-navy/60">
+            <li>
+                <a class="@link" asp-controller="Home" asp-action="Property" asp-route-listingType="@p.ListingType">
+                    Properties for @(isRent ? "rent" : "sale")
                 </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">@p.Title</li>
+            <li aria-hidden="true">/</li>
+            <li class="text-navy" aria-current="page">@p.Title</li>
         </ol>
     </nav>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-        <!-- Property information -->
-        <div class="col-12 col-lg-8">
+        <!-- Property information: one parent card -->
+        <div class="lg:col-span-2">
+            <div class="divide-y divide-ice rounded-lg border border-ice bg-white shadow-sm">
 
-            <div class="mb-4">
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                    <span class="badge @(p.ListingType == "Rent" ? "text-bg-info" : "text-bg-primary")">
-                        For @(p.ListingType == "Rent" ? "rent" : "sale")
-                    </span>
-                    <span class="badge text-bg-light border">@p.PropertyType</span>
-                    <span class="badge text-bg-success">@p.Status</span>
-                    @if (p.IsFeatured)
-                    {
-                        <span class="badge text-bg-warning"><i class="bi bi-star-fill me-1"></i>Featured</span>
-                    }
-                </div>
-
-                <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">@p.Title</h1>
-                <p class="text-secondary mb-3"><i class="bi bi-geo-alt me-1"></i>@location</p>
-                <div class="display-6 fw-semibold text-success">
-                    ₱@p.Price.ToString("N2")@(p.ListingType == "Rent" ? " / month" : "")
-                </div>
-            </div>
-
-            <!-- Key facts -->
-            <div class="card border shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
-                        <div class="col">
-                            <i class="bi bi-door-closed fs-4 text-secondary"></i>
-                            <div class="fw-semibold">@(p.Bedrooms?.ToString() ?? "-")</div>
-                            <div class="small text-secondary">Bedrooms</div>
-                        </div>
-                        <div class="col">
-                            <i class="bi bi-droplet fs-4 text-secondary"></i>
-                            <div class="fw-semibold">@(p.Bathrooms?.ToString() ?? "-")</div>
-                            <div class="small text-secondary">Bathrooms</div>
-                        </div>
-                        <div class="col">
-                            <i class="bi bi-arrows-fullscreen fs-4 text-secondary"></i>
-                            <div class="fw-semibold">@p.FloorAreaSqFt.ToString("N0") sq ft</div>
-                            <div class="small text-secondary">Floor area</div>
-                        </div>
-                        <div class="col">
-                            <i class="bi bi-house-door fs-4 text-secondary"></i>
-                            <div class="fw-semibold">@p.PropertyType</div>
-                            <div class="small text-secondary">Type</div>
-                        </div>
+                <!-- Header: badges, title, location, price -->
+                <header class="p-6">
+                    <div class="mb-3 flex flex-wrap gap-2">
+                        <span class="@(isRent ? badgeOutline : badge)">For @(isRent ? "rent" : "sale")</span>
+                        <span class="@badge">@p.PropertyType</span>
+                        <span class="@(isAvailable ? badgeSolid : badge)">@p.Status</span>
+                        @if (p.IsFeatured)
+                        {
+                            <span class="@badgeOutline"><i data-lucide="star" class="size-3" aria-hidden="true"></i>Featured</span>
+                        }
                     </div>
-                </div>
-            </div>
 
-            <!-- Description -->
-            <div class="card border shadow-sm mb-4">
-                <div class="card-body">
-                    <h2 class="h5 mb-3">About this property</h2>
+                    <h1 class="mb-2 font-display text-3xl font-semibold text-navy md:text-4xl">@p.Title</h1>
+
+                    @if (!string.IsNullOrWhiteSpace(location))
+                    {
+                        <p class="mb-4 flex items-start gap-2 text-navy/60">
+                            <i data-lucide="map-pin" class="mt-0.5 size-4 shrink-0" aria-hidden="true"></i>@location
+                        </p>
+                    }
+
+                    <p class="text-3xl font-semibold text-azure">
+                        ₱@p.Price.ToString("N2")@(isRent ? " / month" : "")
+                    </p>
+                </header>
+
+                <!-- Key facts -->
+                <section class="p-6" aria-label="Key facts">
+                    <dl class="grid grid-cols-2 gap-6 text-center md:grid-cols-4">
+                        <div>
+                            <i data-lucide="bed-double" class="mx-auto mb-2 size-6 text-azure" aria-hidden="true"></i>
+                            <dd class="font-semibold text-navy">@(p.Bedrooms?.ToString() ?? "-")</dd>
+                            <dt class="text-sm text-navy/60">Bedrooms</dt>
+                        </div>
+                        <div>
+                            <i data-lucide="bath" class="mx-auto mb-2 size-6 text-azure" aria-hidden="true"></i>
+                            <dd class="font-semibold text-navy">@(p.Bathrooms?.ToString() ?? "-")</dd>
+                            <dt class="text-sm text-navy/60">Bathrooms</dt>
+                        </div>
+                        <div>
+                            <i data-lucide="maximize" class="mx-auto mb-2 size-6 text-azure" aria-hidden="true"></i>
+                            <dd class="font-semibold text-navy">@p.FloorAreaSqFt.ToString("N0") sq ft</dd>
+                            <dt class="text-sm text-navy/60">Floor area</dt>
+                        </div>
+                        <div>
+                            <i data-lucide="house" class="mx-auto mb-2 size-6 text-azure" aria-hidden="true"></i>
+                            <dd class="font-semibold text-navy">@p.PropertyType</dd>
+                            <dt class="text-sm text-navy/60">Type</dt>
+                        </div>
+                    </dl>
+                </section>
+
+                <!-- Description -->
+                <section class="p-6" aria-labelledby="about-heading">
+                    <h2 id="about-heading" class="@h2">About this property</h2>
                     @if (!string.IsNullOrWhiteSpace(p.Description))
                     {
-                        <p class="mb-0" style="white-space:pre-line;">@p.Description</p>
+                        <p class="whitespace-pre-line text-navy">@p.Description</p>
                     }
                     else
                     {
-                        <p class="text-secondary mb-0">No description provided.</p>
+                        <p class="text-navy/60">No description provided.</p>
                     }
-                </div>
-            </div>
+                </section>
 
-            <!-- Details table -->
-            <div class="card border shadow-sm mb-4">
-                <div class="card-body">
-                    <h2 class="h5 mb-3">Property details</h2>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4 text-secondary fw-normal">Listing type</dt>
-                        <dd class="col-sm-8">@p.ListingType</dd>
-
-                        <dt class="col-sm-4 text-secondary fw-normal">Status</dt>
-                        <dd class="col-sm-8">@p.Status</dd>
-
-                        <dt class="col-sm-4 text-secondary fw-normal">Address</dt>
-                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(p.Address) ? "-" : p.Address)</dd>
-
-                        <dt class="col-sm-4 text-secondary fw-normal">City</dt>
-                        <dd class="col-sm-8">@p.City</dd>
-
-                        <dt class="col-sm-4 text-secondary fw-normal">Province</dt>
-                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(p.Province) ? "-" : p.Province)</dd>
-
-                        <dt class="col-sm-4 text-secondary fw-normal">Country</dt>
-                        <dd class="col-sm-8">@p.Country</dd>
-
-                        <dt class="col-sm-4 text-secondary fw-normal">Listed on</dt>
-                        <dd class="col-sm-8 mb-0">@p.CreatedAt.ToString("MMMM dd, yyyy")</dd>
+                <!-- Details -->
+                <section class="p-6" aria-labelledby="details-heading">
+                    <h2 id="details-heading" class="@h2">Property details</h2>
+                    <dl class="divide-y divide-ice text-sm">
+                        @foreach (var row in new (string Label, string Value)[]
+                        {
+                            ("Listing type", p.ListingType),
+                            ("Status", p.Status),
+                            ("Address", string.IsNullOrWhiteSpace(p.Address) ? "-" : p.Address),
+                            ("City", p.City),
+                            ("Province", string.IsNullOrWhiteSpace(p.Province) ? "-" : p.Province),
+                            ("Country", p.Country),
+                            ("Listed on", p.CreatedAt.ToString("MMMM dd, yyyy"))
+                        })
+                        {
+                            <div class="grid grid-cols-3 gap-4 py-3">
+                                <dt class="text-navy/60">@row.Label</dt>
+                                <dd class="col-span-2 text-navy">@row.Value</dd>
+                            </div>
+                        }
                     </dl>
-                </div>
+                </section>
             </div>
         </div>
 
-        <!-- Sidebar: viewing, agent and developer -->
-        <div class="col-12 col-lg-4">
-            <div class="position-sticky" style="top: 5.5rem;">
+        <!-- Sidebar: one parent card -->
+        <div>
+            <div class="divide-y divide-ice rounded-lg border border-ice bg-white shadow-sm lg:sticky lg:top-24">
 
                 <!-- Schedule a viewing -->
-                <div class="card border shadow-sm mb-4">
-                    <div class="card-body">
-                        <h2 class="h5 mb-2">Interested in this property?</h2>
+                <section class="p-6" aria-labelledby="interest-heading">
+                    <h2 id="interest-heading" class="mb-2 font-display text-lg font-semibold text-navy">Interested in this property?</h2>
 
-                        @if (isAvailable)
-                        {
-                            <p class="small text-secondary mb-3">
-                                Send a viewing request with your preferred date and time.
-                            </p>
-                            <div class="d-grid">
-                                <a class="btn btn-success"
-                                   asp-area="Client"
-                                   asp-controller="Appointment"
-                                   asp-action="Create"
-                                   asp-route-propertyId="@p.Id">
-                                    <i class="bi bi-calendar-check me-1"></i>Schedule a viewing
-                                </a>
-                            </div>
-                        }
-                        else
-                        {
-                            <p class="small text-secondary mb-0">
-                                This property is currently @p.Status.ToLowerInvariant() and is not accepting viewing requests.
-                            </p>
-                        }
-                    </div>
-                </div>
+                    @if (isAvailable)
+                    {
+                        <p class="mb-4 text-sm text-navy/60">Send a viewing request with your preferred date and time.</p>
+                        <a class="@btnPrimary"
+                           asp-area="Client" asp-controller="Appointment" asp-action="Create"
+                           asp-route-propertyId="@p.Id">
+                            <i data-lucide="calendar-check" class="size-4" aria-hidden="true"></i>Schedule a viewing
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-sm text-navy/60">
+                            This property is currently @p.Status.ToLowerInvariant() and is not accepting viewing requests.
+                        </p>
+                    }
+                </section>
 
                 <!-- Listed by -->
-                <div class="card border shadow-sm mb-4">
-                    <div class="card-body">
-                        <h2 class="h5 mb-3">Listed by</h2>
+                <section class="p-6" aria-labelledby="agent-heading">
+                    <h2 id="agent-heading" class="@h2">Listed by</h2>
 
-                        @if (a != null)
-                        {
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                @if (!string.IsNullOrWhiteSpace(a.PhotoUrl))
-                                {
-                                    <img src="@a.PhotoUrl" alt="@a.FullName" class="rounded-circle object-fit-cover"
-                                         style="width:72px;height:72px;" />
-                                }
-                                else
-                                {
-                                    <span class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center"
-                                          style="width:72px;height:72px;">
-                                        <i class="bi bi-person-fill fs-2"></i>
-                                    </span>
-                                }
-                                <div>
-                                    <div class="fw-semibold">@a.FullName</div>
-                                    <div class="small text-secondary">@a.Role</div>
-                                </div>
-                            </div>
-
-                            @if (!string.IsNullOrWhiteSpace(a.Bio))
+                    @if (a != null)
+                    {
+                        <div class="mb-4 flex items-center gap-4">
+                            @if (!string.IsNullOrWhiteSpace(a.PhotoUrl))
                             {
-                                <p class="small text-secondary">@a.Bio</p>
+                                <img src="@a.PhotoUrl" alt="@a.FullName" loading="lazy"
+                                     class="size-16 shrink-0 rounded-full border border-ice object-cover" />
                             }
-
-                            <ul class="list-unstyled small mb-3">
-                                @if (!string.IsNullOrWhiteSpace(a.LicenseNumber))
-                                {
-                                    <li class="mb-1"><i class="bi bi-card-text me-2 text-secondary"></i>License: @a.LicenseNumber</li>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(a.Phone))
-                                {
-                                    <li class="mb-1">
-                                        <i class="bi bi-telephone me-2 text-secondary"></i>
-                                        <a href="tel:@a.Phone" class="text-decoration-none">@a.Phone</a>
-                                    </li>
-                                }
-                                <li>
-                                    <i class="bi bi-envelope me-2 text-secondary"></i>
-                                    <a href="mailto:@a.Email" class="text-decoration-none text-break">@a.Email</a>
-                                </li>
-                            </ul>
-
-                            <div class="d-grid gap-2">
-                                <a class="btn btn-outline-success"
-                                   href="mailto:@a.Email?subject=Inquiry about @p.Title">
-                                    <i class="bi bi-envelope me-1"></i>Contact agent
-                                </a>
-                                @if (!string.IsNullOrWhiteSpace(a.Phone))
-                                {
-                                    <a class="btn btn-outline-success" href="tel:@a.Phone">
-                                        <i class="bi bi-telephone me-1"></i>Call
-                                    </a>
-                                }
+                            else
+                            {
+                                <span class="inline-flex size-16 shrink-0 items-center justify-center rounded-full bg-ice text-azure" aria-hidden="true">
+                                    <i data-lucide="user-round" class="size-7"></i>
+                                </span>
+                            }
+                            <div class="min-w-0">
+                                <p class="break-words font-semibold text-navy">@a.FullName</p>
+                                <p class="text-sm text-navy/60">@a.Role</p>
                             </div>
-                        }
-                        else
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(a.Bio))
                         {
-                            <p class="text-secondary mb-0">
-                                This listing is handled directly by the developer.
-                            </p>
+                            <p class="mb-4 text-sm text-navy/60">@a.Bio</p>
                         }
-                    </div>
-                </div>
+
+                        <ul class="mb-4 space-y-2 text-sm text-navy">
+                            @if (!string.IsNullOrWhiteSpace(a.LicenseNumber))
+                            {
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="id-card" class="size-4 shrink-0 text-navy/60" aria-hidden="true"></i>License: @a.LicenseNumber
+                                </li>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(a.Phone))
+                            {
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="phone" class="size-4 shrink-0 text-navy/60" aria-hidden="true"></i>
+                                    <a href="tel:@a.Phone" class="@link">@a.Phone</a>
+                                </li>
+                            }
+                            <li class="flex items-center gap-2">
+                                <i data-lucide="mail" class="size-4 shrink-0 text-navy/60" aria-hidden="true"></i>
+                                <a href="mailto:@a.Email" class="break-all @link">@a.Email</a>
+                            </li>
+                        </ul>
+
+                        <div class="grid gap-2">
+                            <a class="@btnOutline"
+                               href="mailto:@a.Email?subject=@Uri.EscapeDataString("Inquiry about " + p.Title)">
+                                <i data-lucide="mail" class="size-4" aria-hidden="true"></i>Contact agent
+                            </a>
+                            @if (!string.IsNullOrWhiteSpace(a.Phone))
+                            {
+                                <a class="@btnOutline" href="tel:@a.Phone">
+                                    <i data-lucide="phone" class="size-4" aria-hidden="true"></i>Call
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-sm text-navy/60">This listing is handled directly by the developer.</p>
+                    }
+                </section>
 
                 @if (p.Developer != null)
                 {
-                    <div class="card border shadow-sm">
-                        <div class="card-body">
-                            <h2 class="h5 mb-3">Developer</h2>
-                            <div class="d-flex align-items-center gap-3">
-                                @if (!string.IsNullOrWhiteSpace(p.Developer.LogoUrl))
+                    <section class="p-6" aria-labelledby="dev-heading">
+                        <h2 id="dev-heading" class="@h2">Developer</h2>
+                        <div class="flex items-center gap-4">
+                            @if (!string.IsNullOrWhiteSpace(p.Developer.LogoUrl))
+                            {
+                                <img src="@p.Developer.LogoUrl" alt="@p.Developer.Name" loading="lazy"
+                                     class="size-14 shrink-0 rounded border border-ice bg-white object-contain p-1" />
+                            }
+                            else
+                            {
+                                <span class="inline-flex size-14 shrink-0 items-center justify-center rounded bg-ice text-azure" aria-hidden="true">
+                                    <i data-lucide="building-2" class="size-6"></i>
+                                </span>
+                            }
+                            <div class="min-w-0">
+                                <p class="break-words font-semibold text-navy">@p.Developer.Name</p>
+                                @if (!string.IsNullOrWhiteSpace(p.Developer.WebsiteUrl))
                                 {
-                                    <img src="@p.Developer.LogoUrl" alt="@p.Developer.Name"
-                                         class="rounded object-fit-contain border bg-white" style="width:56px;height:56px;" />
+                                    <a href="@p.Developer.WebsiteUrl" target="_blank" rel="noopener noreferrer"
+                                       class="inline-flex items-center gap-1 text-sm @link">
+                                        Visit website <i data-lucide="external-link" class="size-3.5" aria-hidden="true"></i>
+                                    </a>
                                 }
-                                else
-                                {
-                                    <span class="rounded bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center"
-                                          style="width:56px;height:56px;">
-                                        <i class="bi bi-building fs-4"></i>
-                                    </span>
-                                }
-                                <div>
-                                    <div class="fw-semibold">@p.Developer.Name</div>
-                                    @if (!string.IsNullOrWhiteSpace(p.Developer.WebsiteUrl))
-                                    {
-                                        <a href="@p.Developer.WebsiteUrl" target="_blank" rel="noopener noreferrer"
-                                           class="small text-decoration-none">
-                                            Visit website <i class="bi bi-box-arrow-up-right"></i>
-                                        </a>
-                                    }
-                                </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 }
             </div>
         </div>
     </div>
 
-    <div class="mt-4">
-        <a asp-controller="Home" asp-action="Index" asp-route-listingType="@p.ListingType"
-           class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Back to listings
+    <div class="mt-8">
+        <a asp-controller="Home" asp-action="Property" asp-route-listingType="@p.ListingType"
+           class="inline-flex items-center gap-2 border border-ice bg-white px-4 py-2 font-medium text-navy transition-colors hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+            <i data-lucide="arrow-left" class="size-4" aria-hidden="true"></i>Back to listings
         </a>
     </div>
 </div>

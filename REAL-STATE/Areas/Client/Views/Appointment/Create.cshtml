@@ -3,112 +3,129 @@
 @{
     ViewData["Title"] = "Request a viewing";
     var minDate = DateTime.Today.ToString("yyyy-MM-dd");
+    var isRent = string.Equals(Model.ListingType, "Rent", StringComparison.OrdinalIgnoreCase);
+
+    const string inputCls = "block w-full rounded border border-ice bg-white px-3 py-2.5 text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30";
+    const string labelCls = "mb-1 block text-sm font-medium text-navy";
+    const string errCls = "mt-1 block text-sm text-red-700";
+    const string sectionTitle = "mb-4 text-xs font-semibold uppercase tracking-wider text-navy/60";
+    const string link = "text-azure hover:text-azure-dark hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-azure";
 }
 
-<div class="container py-4 py-lg-5">
+<div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb mb-0 small">
-            <li class="breadcrumb-item">
-                <a asp-controller="Properties" asp-action="Index"
+    <nav aria-label="Breadcrumb" class="mb-6 text-sm">
+        <ol class="flex flex-wrap items-center gap-2 text-navy/60">
+            <li>
+                <a class="@link" asp-area="" asp-controller="Home" asp-action="Property"
                    asp-route-listingType="@Model.ListingType">Properties</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">Request a viewing</li>
+            <li aria-hidden="true">/</li>
+            <li class="text-navy" aria-current="page">Request a viewing</li>
         </ol>
     </nav>
 
-    <div class="mb-4">
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Request a viewing</h1>
-        <p class="text-secondary mb-0">
+    <div class="mb-6">
+        <h1 class="mb-1 font-display text-3xl font-semibold text-navy md:text-4xl">Request a viewing</h1>
+        <p class="text-navy/60">
             Tell us when you'd like to visit. This sends a request; it is not a confirmed booking.
         </p>
     </div>
 
-    <div class="row g-4">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
 
-        <!-- Property summary (shown first on mobile) -->
-        <div class="col-12 col-lg-5 order-1 order-lg-2">
-            <div class="card border shadow-sm">
+        <!-- Property summary (first on mobile, right column on desktop) -->
+        <aside class="order-1 lg:order-2 lg:col-span-5" aria-label="Property summary">
+            <div class="overflow-hidden rounded-lg border border-ice bg-white shadow-sm lg:sticky lg:top-24">
                 @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
                 {
-                    <img src="@Model.PrimaryImageUrl" alt="@Model.PrimaryImageAlt"
-                         class="card-img-top" style="aspect-ratio:16/10; object-fit:cover;" />
+                    <img src="@Model.PrimaryImageUrl"
+                         alt="@(string.IsNullOrWhiteSpace(Model.PrimaryImageAlt) ? Model.PropertyTitle : Model.PrimaryImageAlt)"
+                         class="aspect-[16/10] w-full object-cover" />
                 }
-                <div class="card-body">
-                    <h2 class="h5 mb-1 text-break">@Model.PropertyTitle</h2>
+                <div class="p-6">
+                    <h2 class="mb-1 break-words font-display text-lg font-semibold text-navy">@Model.PropertyTitle</h2>
                     @if (!string.IsNullOrWhiteSpace(Model.PropertyLocation))
                     {
-                        <p class="text-secondary small mb-2 text-break">@Model.PropertyLocation</p>
+                        <p class="mb-3 break-words text-sm text-navy/60">@Model.PropertyLocation</p>
                     }
-                    <p class="fs-5 fw-semibold text-success mb-0">
-                        ₱@Model.Price.ToString("N0")@(string.Equals(Model.ListingType, "Rent", StringComparison.OrdinalIgnoreCase) ? " / month" : "")
+                    <p class="text-xl font-semibold text-azure">
+                        ₱@Model.Price.ToString("N0")@(isRent ? " / month" : "")
                     </p>
                     @if (!string.IsNullOrWhiteSpace(Model.AgentName))
                     {
-                        <hr />
-                        <p class="small text-secondary mb-0">Listing agent: <span class="text-dark">@Model.AgentName</span></p>
+                        <hr class="my-4 border-ice" />
+                        <p class="text-sm text-navy/60">Listing agent: <span class="text-navy">@Model.AgentName</span></p>
                     }
                 </div>
             </div>
-        </div>
+        </aside>
 
         <!-- Form -->
-        <div class="col-12 col-lg-7 order-2 order-lg-1">
-            <form asp-action="Create" method="post" class="card border shadow-sm" novalidate>
-                <div class="card-body p-4">
-                    <input type="hidden" asp-for="PropertyId" />
+        <div class="order-2 lg:order-1 lg:col-span-7">
+            <form asp-action="Create" method="post" novalidate
+                  class="rounded-lg border border-ice bg-white p-6 shadow-sm md:p-8">
 
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="PropertyId" />
 
-                    <h2 class="h6 text-uppercase text-secondary mb-3" style="letter-spacing:1px;">When</h2>
-                    <div class="row g-3 mb-4">
-                        <div class="col-12 col-sm-6">
-                            <label asp-for="PreferredDate" class="form-label"></label>
-                            <input asp-for="PreferredDate" class="form-control" min="@minDate" />
-                            <span asp-validation-for="PreferredDate" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <label asp-for="PreferredTime" class="form-label"></label>
-                            <input asp-for="PreferredTime" class="form-control" />
-                            <span asp-validation-for="PreferredTime" class="text-danger small"></span>
-                        </div>
+                <div asp-validation-summary="ModelOnly" class="mb-4 text-sm text-red-700" role="alert"></div>
+
+                <h2 class="@sectionTitle">When</h2>
+                <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label asp-for="PreferredDate" class="@labelCls"></label>
+                        <input asp-for="PreferredDate" class="@inputCls" min="@minDate" />
+                        <span asp-validation-for="PreferredDate" class="@errCls"></span>
                     </div>
-
-                    <h2 class="h6 text-uppercase text-secondary mb-3" style="letter-spacing:1px;">Your details</h2>
-                    <div class="row g-3 mb-4">
-                        <div class="col-12">
-                            <label asp-for="ContactName" class="form-label"></label>
-                            <input asp-for="ContactName" class="form-control" autocomplete="name" />
-                            <span asp-validation-for="ContactName" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <label asp-for="ContactEmail" class="form-label"></label>
-                            <input asp-for="ContactEmail" type="email" class="form-control" autocomplete="email" />
-                            <span asp-validation-for="ContactEmail" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <label asp-for="ContactPhone" class="form-label"></label>
-                            <input asp-for="ContactPhone" type="tel" class="form-control" autocomplete="tel" />
-                            <span asp-validation-for="ContactPhone" class="text-danger small"></span>
-                        </div>
-                        <div class="col-12">
-                            <label asp-for="Notes" class="form-label"></label>
-                            <textarea asp-for="Notes" rows="3" class="form-control"
-                                      placeholder="Anything the agent should know before the visit?"></textarea>
-                            <span asp-validation-for="Notes" class="text-danger small"></span>
-                        </div>
+                    <div>
+                        <label asp-for="PreferredTime" class="@labelCls"></label>
+                        <input asp-for="PreferredTime" class="@inputCls" />
+                        <span asp-validation-for="PreferredTime" class="@errCls"></span>
                     </div>
-
-                    <div class="d-flex flex-column flex-sm-row gap-2">
-                        <button type="submit" class="btn btn-success px-4">Send viewing request</button>
-                        <a asp-controller="Properties" asp-action="Index"
-                           asp-route-listingType="@Model.ListingType"
-                           class="btn btn-outline-secondary">Cancel</a>
-                    </div>
-                    <p class="small text-secondary mt-3 mb-0">
-                        Your request will be saved with a status of "Pending" until it is reviewed.
-                    </p>
                 </div>
+
+                <hr class="mb-6 border-ice" />
+
+                <h2 class="@sectionTitle">Your details</h2>
+                <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label asp-for="ContactName" class="@labelCls"></label>
+                        <input asp-for="ContactName" class="@inputCls" autocomplete="name" />
+                        <span asp-validation-for="ContactName" class="@errCls"></span>
+                    </div>
+                    <div>
+                        <label asp-for="ContactEmail" class="@labelCls"></label>
+                        <input asp-for="ContactEmail" type="email" class="@inputCls" autocomplete="email" />
+                        <span asp-validation-for="ContactEmail" class="@errCls"></span>
+                    </div>
+                    <div>
+                        <label asp-for="ContactPhone" class="@labelCls"></label>
+                        <input asp-for="ContactPhone" type="tel" class="@inputCls" autocomplete="tel" />
+                        <span asp-validation-for="ContactPhone" class="@errCls"></span>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label asp-for="Notes" class="@labelCls"></label>
+                        <textarea asp-for="Notes" rows="3" class="@inputCls"
+                                  placeholder="Anything the agent should know before the visit?"></textarea>
+                        <span asp-validation-for="Notes" class="@errCls"></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <button type="submit"
+                            class="inline-flex items-center justify-center bg-azure px-6 py-3 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+                        Send viewing request
+                    </button>
+                    <a asp-area="" asp-controller="Home" asp-action="Property"
+                       asp-route-listingType="@Model.ListingType"
+                       class="inline-flex items-center justify-center border border-azure px-6 py-3 font-medium text-azure transition-colors hover:bg-azure hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+                        Cancel
+                    </a>
+                </div>
+
+                <p class="mt-4 text-sm text-navy/60">
+                    Your request will be saved with a status of "Pending" until it is reviewed.
+                </p>
             </form>
         </div>
     </div>

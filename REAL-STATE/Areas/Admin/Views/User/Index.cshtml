@@ -2,116 +2,81 @@
 @model IEnumerable<UserRowVM>
 @{
     ViewData["Title"] = "Users";
+
+    const string btnPrimary = "inline-flex items-center gap-2 bg-azure px-4 py-2 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+
+    var rows = (Model ?? Enumerable.Empty<UserRowVM>()).Select(u => new
+    {
+        id = u.Id,
+        user = u.FullName,
+        email = u.Email,
+        phone = u.PhoneNumber,
+        role = u.Role,
+        status = u.IsLocked ? "Locked" : "Active",
+        isLocked = u.IsLocked,
+        isCurrentUser = u.IsCurrentUser,
+        editUrl = Url.Action("Upsert", "User", new { area = "Admin", id = u.Id })
+    }).ToList();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
+    <link rel="stylesheet" href="~/css/tabulator-theme.css" asp-append-version="true" />
 }
 
 @Html.AntiForgeryToken()
 
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-white rounded-2">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-        <h1 class="h2 mb-1" style="font-family:'Playfair Display',serif;">Users</h1>
-        <p class="text-secondary mb-0">Manage user accounts and roles.</p>
+        <h1 class="mb-1 font-display text-3xl font-semibold text-navy">Users</h1>
+        <p class="text-navy/60">Manage user accounts and roles.</p>
     </div>
-    <a asp-area="Admin" asp-controller="User" asp-action="Upsert" class="btn btn-outline-primary">
-        <i class="bi bi-plus-lg me-1"></i>Create
+    <a asp-area="Admin" asp-controller="User" asp-action="Upsert" class="@btnPrimary">
+        <i data-lucide="plus" class="size-4" aria-hidden="true"></i>Create
     </a>
 </div>
 
-@if (Model != null && Model.Any())
+@if (rows.Any())
 {
-    <div class="card border shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="userTable" class="table table-hover align-middle w-100">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var user in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center fw-semibold"
-                                              style="width:36px;height:36px;">
-                                            @(string.IsNullOrWhiteSpace(user.FullName) ? "?" : user.FullName.Trim()[0].ToString().ToUpper())
-                                        </span>
-                                        <span class="fw-semibold">@user.FullName</span>
-                                        @if (user.IsCurrentUser)
-                                        {
-                                            <span class="badge text-bg-light border">You</span>
-                                        }
-                                    </div>
-                                </td>
-                                <td>@user.Email</td>
-                                <td>@user.PhoneNumber</td>
-                                <td><span class="badge text-bg-primary">@user.Role</span></td>
-                                <td>
-                                    @if (user.IsLocked)
-                                    {
-                                        <span class="badge text-bg-danger">Locked</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge text-bg-success">Active</span>
-                                    }
-                                </td>
-                                <td class="text-end text-nowrap">
-                                    <a asp-area="Admin" asp-controller="User" asp-action="Upsert"
-                                       asp-route-id="@user.Id"
-                                       class="btn btn-sm btn-primary">
-                                        <i class="bi bi-pencil-square me-1"></i>Edit
-                                    </a>
+    <div class="rounded-lg border border-ice bg-white p-4 shadow-sm md:p-5">
 
-                                    @if (!user.IsCurrentUser)
-                                    {
-                                        if (user.IsLocked)
-                                        {
-                                            <button type="button"
-                                                    class="btn btn-sm btn-success js-lock"
-                                                    data-id="@user.Id"
-                                                    data-title="@user.FullName"
-                                                    data-locked="false">
-                                                <i class="bi bi-unlock me-1"></i>Unlock
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button type="button"
-                                                    class="btn btn-sm btn-warning js-lock"
-                                                    data-id="@user.Id"
-                                                    data-title="@user.FullName"
-                                                    data-locked="true">
-                                                <i class="bi bi-lock me-1"></i>Lock
-                                            </button>
-                                        }
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="w-full sm:w-72">
+                <label for="userSearch" class="sr-only">Search users</label>
+                <div class="relative">
+                    <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-navy/50" aria-hidden="true"></i>
+                    <input id="userSearch" type="search" placeholder="Search users"
+                           class="block w-full rounded border border-ice bg-white py-2 pl-9 pr-3 text-sm text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
+                </div>
             </div>
+            <p id="userCount" class="text-sm text-navy/60" aria-live="polite"></p>
         </div>
+
+        <div id="userTable"></div>
     </div>
 }
 else
 {
-    <div class="text-center bg-white border rounded p-5">
-        <h2 class="h5">No users yet</h2>
-        <p class="text-secondary">Add your first user to see them listed here.</p>
-        <a asp-area="Admin" asp-controller="User" asp-action="Upsert" class="btn btn-success">
-            Add user
+    <div class="rounded-lg border border-ice bg-white p-12 text-center">
+        <div class="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-ice">
+            <i data-lucide="users" class="size-6 text-azure" aria-hidden="true"></i>
+        </div>
+        <h2 class="mb-1 font-display text-lg font-semibold text-navy">No users yet</h2>
+        <p class="mb-4 text-navy/60">Add your first user to see them listed here.</p>
+        <a asp-area="Admin" asp-controller="User" asp-action="Upsert" class="@btnPrimary">
+            <i data-lucide="plus" class="size-4" aria-hidden="true"></i>Add user
         </a>
     </div>
 }
 
 @section Scripts {
-    <script src="/js/user.js"></script>
+    <script src="~/lib/tabulator/tabulator.min.js"></script>
+
+    @if (rows.Any())
+    {
+        <script id="userData" type="application/json">@Html.Raw(Json.Serialize(rows))</script>
+        <script src="~/js/user-table.js" asp-append-version="true"></script>
+    }
+
+    <script src="~/js/user.js" asp-append-version="true"></script>
 }
