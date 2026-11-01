@@ -1296,6 +1296,14 @@
     .hover\:bg-azure-dark:hover {
       background-color: var(--color-azure-dark);
     }
+    .hover\:bg-azure\/90:hover {
+      background-color: color-mix(in srgb, #3F72AF 90%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-azure\/90:hover {
+        background-color: color-mix(in oklab, var(--color-azure) 90%, transparent);
+      }
+    }
     .hover\:bg-blue-50:hover {
       background-color: var(--color-blue-50);
     }

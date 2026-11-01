@@ -6,8 +6,8 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project>
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAXMaMfXaEaEyPbcf6AIil9QAAAAACAAAAAAAQZgAAAAEAACAAAAD3BTkR+hj9WY5rwZQU++CDUf1fZW8U1jufq4mTVmRcBgAAAAAOgAAAAAIAACAAAAAH/m/7eUtG6mge3pN28AjIcwW6an4NfF3YbigWMDv4oyAAAAADRYQSHfwW008ROUvcyDrgve2DjuL6u1yBbLRiukawR0AAAABrIF80vgv18GPITmrXSL1ovYvcSQ62zvavEiJhFYmXLtpii8v1XLoRXBy4hh5lR/iGOjjj8BNp28o7nI5IWms8</EncryptedPassword>
-    <History>True|2026-10-24T02:55:42.0685625Z||;</History>
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAXMaMfXaEaEyPbcf6AIil9QAAAAACAAAAAAAQZgAAAAEAACAAAAAi0yacILs4fuD1/5uvwlDA8U8xnKAUZ4W3jFi/ZtCbeQAAAAAOgAAAAAIAACAAAADZD56utOfwzvHvd2B0L2AkBQbeAJN0ek4dO2u79BLbPCAAAADOFm+efimaFhwDMUMWQO1sltZNwJsAMULIYuACB8LXrUAAAAALTNcGpsisV2vuQDRaqUHgTbWknbxXSXk7a/FTZV/Ny2HJkjNEkiCKp8chfkF2EpFlE8QRHOeMThrsI/lJHtgx</EncryptedPassword>
+    <History>True|2026-11-01T11:38:57.8555922Z||;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

@@ -13,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Connection string comes from User Secrets (local) or appsettings.Production.json (server)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString) || connectionString == "SET_IN_SECRETS_OR_SERVER")
     throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
@@ -24,9 +23,6 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
-//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-//    .AddEntityFrameworkStores<ApplicationDbContext>()
-//    .AddDefaultTokenProviders();
 
 #region -- Register Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -72,7 +68,7 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Home}/{action=Hero}/{id?}")
     .WithStaticAssets();
 SeedDatabase();
 app.MapRazorPages().WithStaticAssets();

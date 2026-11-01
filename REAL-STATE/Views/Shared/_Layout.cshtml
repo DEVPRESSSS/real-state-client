@@ -32,19 +32,17 @@
     var logoutReturnUrl = Url.Action("Index", "Home", new { area = "" });
 }
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - REAL_STATE</title>
+    <title>@ViewData["Title"] - SHR</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/REAL_STATE.styles.css" asp-append-version="true" />
-
+    <link rel="icon" href="~/Logo.ico"/>
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,19 +149,32 @@
 
                 <!-- Mobile toggle -->
                 <button type="button"
-                        class="inline-flex items-center justify-center rounded-md p-2 text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 lg:hidden"
+                        class="inline-flex items-center justify-center rounded-md border border-gray-300 text-navy p-2  
+                    transition-colors hover:bg-azure/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 lg:hidden"
                         data-toggle="#mobileMenu"
                         aria-controls="mobileMenu"
                         aria-expanded="false"
                         aria-label="Toggle navigation">
-                    <i class="bi bi-list text-2xl" data-icon-open aria-hidden="true"></i>
-                    <i class="bi bi-x-lg hidden text-xl" data-icon-close aria-hidden="true"></i>
+
+                    <i data-lucide="menu"
+                       data-icon-open
+                       class="size-6"></i>
+
+                    <i data-lucide="x"
+                       data-icon-close
+                       class="hidden size-6"></i>
                 </button>
             </div>
 
             <!-- Mobile menu -->
             <div id="mobileMenu" class="hidden border-t border-gray-200 pb-4 lg:hidden">
                 <ul class="space-y-1 pt-3">
+                    <li>
+                        <a class="block rounded-md px-3 py-2.5 text-base @NavClass("Home", "Hero")"
+                           asp-area="" asp-controller="Home" asp-action="Hero">
+                            Home
+                        </a>
+                    </li>
                     <li>
                         <a class="block rounded-md px-3 py-2.5 text-base @NavClass("Home", "Index")"
                            asp-area="" asp-controller="Home" asp-action="Index">
@@ -180,6 +191,12 @@
                         <a class="block rounded-md px-3 py-2.5 text-base @NavClass("Home", "Agents")"
                            asp-area="" asp-controller="Home" asp-action="Agents">
                             Agents &amp; Brokers
+                        </a>
+                    </li>
+                    <li>
+                        <a class="block rounded-md px-3 py-2.5 text-base @NavClass("Home", "Privacy")"
+                           asp-area="" asp-controller="Home" asp-action="Privacy">
+                            About Us
                         </a>
                     </li>
                 </ul>
@@ -232,7 +249,7 @@
                 <div class="lg:col-span-2">
                     <a asp-area="" asp-controller="Home" asp-action="Index"
                        class="font-display text-2xl font-bold tracking-tight text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-navy">
-                        Realty
+                        SHR
                     </a>
                     <p class="mt-3 max-w-sm text-sm text-white/70">
                         Browse listings from developers, agents and brokers in one place.
@@ -273,53 +290,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Navbar: mobile menu + user dropdown -->
-    <script>
-        (function () {
-        var toggles = document.querySelectorAll('[data-toggle]');
-
-        function setOpen(btn, menu, open) {
-        menu.classList.toggle('hidden', !open);
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        var iconOpen = btn.querySelector('[data-icon-open]');
-        var iconClose = btn.querySelector('[data-icon-close]');
-        if (iconOpen && iconClose) {
-        iconOpen.classList.toggle('hidden', open);
-        iconClose.classList.toggle('hidden', !open);
-        }
-        }
-
-        toggles.forEach(function (btn) {
-        var menu = document.querySelector(btn.getAttribute('data-toggle'));
-        if (!menu) return;
-
-        btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        setOpen(btn, menu, menu.classList.contains('hidden'));
-        });
-        });
-
-        // Close the user dropdown when clicking elsewhere or pressing Escape
-        document.addEventListener('click', function (e) {
-        document.querySelectorAll('[data-dropdown]').forEach(function (dd) {
-        if (dd.contains(e.target)) return;
-        var btn = dd.querySelector('[data-toggle]');
-        var menu = dd.querySelector('div[id]');
-        if (btn && menu) setOpen(btn, menu, false);
-        });
-        });
-
-        document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        toggles.forEach(function (btn) {
-        var menu = document.querySelector(btn.getAttribute('data-toggle'));
-        if (menu && !menu.classList.contains('hidden')) {
-        setOpen(btn, menu, false);
-        btn.focus();
-        }
-        });
-        });
-        })();
-    </script>
 
     @if (TempData["SuccessMessage"] is string successMsg)
     {
@@ -336,6 +306,11 @@
     }
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 
 </body>
 </html>
