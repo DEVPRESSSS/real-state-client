@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using REAL_STATE.Models
+@using REAL_STATE.Utilities
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
@@ -70,8 +71,8 @@
                 <!-- Desktop navigation -->
                 <ul class="hidden lg:flex lg:items-center lg:gap-2">
                     <li>
-                        <a class="rounded-md px-3 py-2 text-sm transition-colors @NavClass("Home", "Hero")"
-                           asp-area="" asp-controller="Home" asp-action="Hero">
+                        <a class="rounded-md px-3 py-2 text-sm transition-colors @(User.IsInRole(RoleSD.User) ? "hidden" : "visible") @NavClass("Home", "Hero")"
+                           asp-controller="Home" asp-action="Hero">
                             Home
                         </a>
                     </li>
@@ -95,7 +96,7 @@
                     </li>
 
                     <li>
-                        <a class="rounded-md px-3 py-2 text-sm transition-colors @NavClass("Home", "Privacy")"
+                        <a class="rounded-md px-3 py-2 text-sm transition-colors @(User.IsInRole(RoleSD.User) ? "hidden" : "visible") @NavClass("Home", "Privacy")"
                            asp-area="" asp-controller="Home" asp-action="Privacy">
                             About Us
                         </a>
@@ -225,7 +226,7 @@
                     }
                     else
                     {
-                        <a class="block w-full rounded-md border border-blue-600 px-4 py-2.5 text-center text-sm font-medium text-blue-700 transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                        <a class="block w-full rounded-md border border-azure px-4 py-2.5 text-center text-sm font-medium text-navy transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                            asp-area="Identity" asp-page="/Account/Login">
                             Sign In
                         </a>

@@ -50,3 +50,4 @@ try {
         document.documentElement.classList.add('sidebar-collapsed');
     }
 } catch (e) { }
+
