@@ -29,5 +29,7 @@ namespace REAL_STATE.Services.Interfaces
            int page,
            int pageSize
        );
+
+        Task<(bool Success, string Message)> ApprovedOrRejectAppoinment(string appointmentId);
     }
 }

@@ -24,5 +24,37 @@ namespace REAL_STATE.Areas.Admin.Controllers
 
             return View(result);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(string appointmentId)
+        {
+            if (string.IsNullOrWhiteSpace(appointmentId))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid appointment ID."
+                });
+            }
+
+            var result = await _appointmentService
+                .ApprovedOrRejectAppoinment(appointmentId);
+
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = result.Message
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                message = result.Message
+            });
+        }
     }
 }

@@ -121,11 +121,7 @@ namespace REAL_STATE.Services
         private async Task<Property?> LoadPropertyAsync(string propertyId) =>
 
                         await _propertyRepository.GetAsync(x => x.Id == propertyId, includeProperties: "Images,Agent");
-        //_db.Properties
-        //   .AsNoTracking()
-        //   .Include(p => p.Images)
-        //   .Include(p => p.Agent)
-        //   .FirstOrDefaultAsync(p => p.Id == propertyId);
+      
 
         private static void FillPropertySummary(ScheduleAppointmentVM vm, Property p)
         {
@@ -142,9 +138,42 @@ namespace REAL_STATE.Services
             vm.AgentName = p.Agent?.FullName;
         }
 
-        public Task<PagedResult<AppointmentListVM>> GetAppointmentsAsync(int page, int pageSize)
+        public async Task<PagedResult<AppointmentListVM>> GetAppointmentsAsync(
+            int page,
+            int pageSize)
         {
-            throw new NotImplementedException();
+            page = Math.Max(1, page);
+            pageSize = Math.Clamp(pageSize, 10, 100);
+
+            return await _appointmentRepository.GetPagedAsync(
+                page,
+                pageSize
+            );
+        }
+
+
+        public async Task<(bool Success, string Message)> ApprovedOrRejectAppoinment(string appointmentId)
+        {
+            var appointment = await _appointmentRepository.GetAsync(
+                 a => a.Id == appointmentId
+             );
+
+            if (appointment == null)
+            {
+                return (false, "Viewing appointment was not found.");
+            }
+
+            if (appointment.Status != "Pending")
+            {
+                return (false, "This appointment has already been processed.");
+            }
+
+            appointment.Status = "Approved";
+            await _appointmentRepository.UpdateAsync(appointment);
+            await _appointmentRepository.Save();
+
+            return (true,
+                $"Viewing request has been approved for {appointment.ContactName}.");
         }
     }
 }
