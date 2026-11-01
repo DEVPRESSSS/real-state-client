@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        <form method="get" action="/Home/Property"
+        @* <form method="get" action="/Home/Property"
               class="max-w-4xl rounded-lg bg-white p-4 text-navy shadow-sm md:p-6">
             <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
                 <div class="md:col-span-3">
@@ -38,7 +38,7 @@
                     </button>
                 </div>
             </div>
-        </form>
+        </form> *@
 
         <div class="mt-8 flex flex-wrap items-center gap-3">
             <a href="/Identity/Account/Register"
@@ -185,7 +185,7 @@
         <h2 class="mb-3 font-display text-3xl font-semibold text-navy md:text-4xl">Ready to get started?</h2>
         <p class="mx-auto mb-8 max-w-xl text-navy/60">Browse the latest listings now, or create an account to save and inquire.</p>
         <div class="flex flex-wrap justify-center gap-3">
-            <a href="/Home/Property"
+            <a  asp-controller ="Home" asp-action ="Index"
                class="inline-flex items-center justify-center bg-azure px-6 py-3 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
                 Browse properties
             </a>

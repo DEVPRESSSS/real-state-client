@@ -175,5 +175,17 @@ namespace REAL_STATE.Services
             return (true,
                 $"Viewing request has been approved for {appointment.ContactName}.");
         }
+
+        public async Task<PagedResult<AppointmentListVM>> GetAppointmentsForAgentAsync(int page, int pageSize, string userId)
+        {
+            page = Math.Max(1, page);
+            pageSize = Math.Clamp(pageSize, 10, 100);
+
+            return await _appointmentRepository.GetPagedAppointentForAgentAsync(
+                page,
+                pageSize,
+                userId
+            );
+        }
     }
 }

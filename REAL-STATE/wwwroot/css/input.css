@@ -9,7 +9,15 @@
     --color-ice: #DBE2EF;
     --color-snow: #F9F7F7;
 }
+@media (min-width: 1024px) {
+    html.sidebar-collapsed #sidebarToggle {
+        display: none;
+    }
 
+    html.sidebar-collapsed #sidebarExpand {
+        display: inline-flex;
+    }
+}
 
 div.tabulator.tabulator {
     border: 0;

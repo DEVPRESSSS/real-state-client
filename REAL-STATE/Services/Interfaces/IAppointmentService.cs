@@ -30,6 +30,12 @@ namespace REAL_STATE.Services.Interfaces
            int pageSize
        );
 
+        Task<PagedResult<AppointmentListVM>> GetAppointmentsForAgentAsync(
+           int page,
+           int pageSize,
+           string userId
+       );
+
         Task<(bool Success, string Message)> ApprovedOrRejectAppoinment(string appointmentId);
     }
 }

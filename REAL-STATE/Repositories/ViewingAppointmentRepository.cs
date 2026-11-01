@@ -12,12 +12,57 @@ namespace REAL_STATE.Repositories
           : base(db)
         {
         }
-        public async Task<PagedResult<AppointmentListVM>> GetPagedAsync(
-            int page,
-            int pageSize)
+
+        public async Task<PagedResult<AppointmentListVM>> GetPagedAppointentForAgentAsync(int page, 
+            int pageSize, string userId)
         {
             var query = _db.ViewingAppointments
                 .AsNoTracking();
+
+
+            var totalItems = await query.CountAsync();
+
+            var appointments = await query
+                .Where(a => a.UserId == userId)
+                .OrderByDescending(a => a.CreatedAt)
+                .ThenBy(a => a.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(a => new AppointmentListVM
+                {
+                    Id = a.Id,
+                    Property = a.Property.Title,
+                    ContactName = a.ContactName,
+                    Email = a.ContactEmail,
+                    Phone = a.ContactPhone,
+                    Agent = a.Agent != null
+                        ? "You"
+                        : "Unassigned",
+                    ScheduledAt = a.ScheduledAt,
+                    Status = a.Status,
+                    Notes = a.Notes,
+                    CreatedAt = a.CreatedAt
+                })
+                .ToListAsync();
+
+            return new PagedResult<AppointmentListVM>
+            {
+                Items = appointments,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+        }
+
+        public async Task<PagedResult<AppointmentListVM>> GetPagedAsync(
+            int page,
+            int pageSize
+            )
+        {
+            
+            var query = _db.ViewingAppointments
+                .AsNoTracking();
+            
 
             var totalItems = await query.CountAsync();
 

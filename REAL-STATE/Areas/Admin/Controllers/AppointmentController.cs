@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services.Interfaces;
 using REAL_STATE.Utilities;
+using System.Security.Claims;
 
 namespace REAL_STATE.Areas.Admin.Controllers
 {
     [Area(RoleSD.Admin)]
-    [Authorize(Roles = RoleSD.Admin)]
+    [Authorize(Roles = $"{RoleSD.Admin},{RoleSD.Agent}")]
     public class AppointmentController : Controller
     {
         private readonly IAppointmentService _appointmentService;
@@ -17,12 +18,18 @@ namespace REAL_STATE.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var result = await _appointmentService.GetAppointmentsAsync(
-                page,
-                pageSize
-            );
+            if (User.IsInRole(RoleSD.Admin))
+            {
+                var all = await _appointmentService.GetAppointmentsAsync(page, pageSize);
+                return View(all);
+            }
 
-            return View(result);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Forbid();
+
+            var mine = await _appointmentService.GetAppointmentsForAgentAsync( page, pageSize, userId);
+            return View(mine);
         }
 
         [HttpPost]

@@ -65,8 +65,7 @@
             <!-- Actions -->
             <div class="flex flex-col justify-center gap-3 sm:flex-row">
 
-                <a asp-controller="Properties"
-                   asp-action="Index"
+                <a asp-area="" asp-controller="Home" asp-action="Index"
                    class="inline-flex items-center justify-center gap-2 rounded-md bg-azure px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
 
                     <i data-lucide="building-2" class="size-4"></i>
@@ -74,8 +73,8 @@
                     Browse more properties
                 </a>
 
-                <a asp-controller="Home"
-                   asp-action="Index"
+                <a asp-area="" asp-controller="Home" asp-action="Hero"
+                    
                    class="inline-flex items-center justify-center gap-2 rounded-md border border-azure bg-white px-5 py-2.5 text-sm font-medium text-azure transition-colors hover:bg-azure hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
 
                     <i data-lucide="arrow-left" class="size-4"></i>

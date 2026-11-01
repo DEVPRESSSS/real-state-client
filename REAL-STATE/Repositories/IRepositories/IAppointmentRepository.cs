@@ -9,5 +9,12 @@ namespace REAL_STATE.Repositories.IRepositories
             int page,
             int pageSize
         );
+
+        Task<PagedResult<AppointmentListVM>> GetPagedAppointentForAgentAsync(
+             int page,
+             int pageSize,
+             string userId
+         );
+
     }
 }

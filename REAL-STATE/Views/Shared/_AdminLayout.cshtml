@@ -1,7 +1,10 @@
-﻿
-@using REAL_STATE.Utilities
+﻿@using REAL_STATE.Utilities
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+    var isAdmin = User.IsInRole(RoleSD.Admin);
+    var isAgent = User.IsInRole(RoleSD.Agent);
+    var dashboardArea = isAdmin ? "Admin" : "AgentAndBroker";
 
     const string linkBase = "flex items-center gap-3 whitespace-nowrap rounded px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-azure lg:group-[.sidebar-collapsed]/shell:justify-center lg:group-[.sidebar-collapsed]/shell:px-0";
     const string linkActive = "bg-azure text-white";
@@ -34,12 +37,11 @@
         } catch (e) { }
     </script>
 
-    <!-- Tailwind CSS -->
+    <!-- Tabulator base CSS first, then Tailwind -->
+    <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/REAL_STATE.styles.css" asp-append-version="true" />
 
-     <!-- Tabulator Js-->
-    <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +52,7 @@
 
 <body class="bg-snow font-sans text-navy antialiased">
 
-    <!-- Header -->
+    <!-- Header (73px tall: py-3 + h-12 logo + 1px border) -->
     <header class="sticky top-0 z-30 border-b border-ice bg-white">
         <div class="flex items-center justify-between px-4 py-3 lg:px-6">
 
@@ -59,30 +61,33 @@
                 <!-- Sidebar toggle (mobile) -->
                 <button id="sidebarOpen"
                         type="button"
-                        class="inline-flex size-10 items-center justify-center rounded text-navy hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure lg:hidden"
+                        class="inline-flex size-10 items-center justify-center rounded text-navy hover:bg-ice 
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-azure lg:hidden"
                         aria-controls="adminSidebar"
                         aria-expanded="false"
                         aria-label="Open admin menu">
-
                     <i data-lucide="menu" class="size-6" aria-hidden="true"></i>
                 </button>
 
-                <!-- Sidebar toggle (desktop): collapse to icons -->
-                <button id="sidebarToggle"
+                <!-- Expand sidebar (desktop, shown only while collapsed) -->
+                <button id="sidebarExpand"
                         type="button"
-                        class="hidden size-10 items-center justify-center rounded text-navy hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure lg:inline-flex"
+                        class="hidden size-10 items-center justify-center rounded text-navy hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure"
                         aria-controls="adminSidebar"
-                        aria-label="Collapse or expand sidebar">
-
-                    <i data-lucide="panel-left" class="size-5" aria-hidden="true"></i>
+                        aria-label="Expand sidebar"
+                        title="Expand sidebar">
+                    <i data-lucide="panel-left-open" class="size-5" aria-hidden="true"></i>
                 </button>
 
                 <!-- Brand -->
-                <a class="ml-1 font-display text-2xl font-bold tracking-tight text-navy"
-                   asp-area="Admin"
+                <a class="flex shrink-0 items-center rounded"
+                   asp-area="@dashboardArea"
                    asp-controller="Dashboard"
                    asp-action="Index">
-                    Realty
+                   
+                    <img class="h-12 w-auto max-w-[220px] object-contain"
+                         src="/images/Logo.png"
+                         alt="SouthernHomesRealty" />
                 </a>
             </div>
 
@@ -92,11 +97,8 @@
                   asp-area="Identity"
                   asp-page="/Account/Logout"
                   asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-
                 <button type="submit"
-                        class="inline-flex items-center gap-2 border border-ice bg-white px-3 py-1.5 text-sm font-medium text-navy
-                        transition-colors hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
-
+                        class="inline-flex items-center gap-2 border border-ice bg-white px-3 py-1.5 text-sm font-medium text-navy transition-colors hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
                     <i data-lucide="log-out" class="size-4" aria-hidden="true"></i>
                     Sign out
                 </button>
@@ -110,64 +112,64 @@
          aria-hidden="true">
     </div>
 
-    <div class="flex">''
+    <div class="flex">
+
         <!-- Sidebar -->
         <aside id="adminSidebar"
-               class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col overflow-x-hidden border-r border-ice bg-white transition-all
-                duration-200 lg:sticky lg:top-[65px] lg:z-20 lg:h-[calc(100vh-65px)] lg:w-[250px] lg:shrink-0 lg:translate-x-0 lg:group-[.sidebar-collapsed]/shell:w-[76px]"
+               class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col overflow-x-hidden border-r border-ice bg-white transition-all duration-200 lg:sticky lg:top-[73px] lg:z-20 lg:h-[calc(100vh-73px)] lg:w-[250px] lg:shrink-0 lg:translate-x-0 lg:group-[.sidebar-collapsed]/shell:w-[76px]"
                aria-label="Admin sidebar">
 
             <!-- Mobile sidebar header -->
             <div class="flex items-center justify-between border-b border-ice px-4 py-3 lg:hidden">
-
-                <h2 class="text-base font-medium text-navy">
-                    Admin menu
-                </h2>
+                <h2 class="text-base font-medium text-navy">Admin menu</h2>
 
                 <button id="sidebarClose"
                         type="button"
                         class="inline-flex size-9 items-center justify-center rounded text-navy hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure"
                         aria-label="Close admin menu">
-
                     <i data-lucide="x" class="size-5" aria-hidden="true"></i>
                 </button>
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3"
-                 aria-label="Admin">
-
+            <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3" aria-label="Admin">
                 <ul class="flex flex-col gap-1">
 
-                    <!-- Admin navigation -->
-                    @if (User.IsInRole(RoleSD.Admin))
+                    <!-- Dashboard row + collapse button (shared by Admin and Agent) -->
+                    @if (isAdmin || isAgent)
                     {
-                        <li>
-                            <a class="@NavClass("Dashboard")"
-                               title="Dashboard"
-                               asp-area="Admin"
+                        <li class="flex items-center gap-1">
+                            <a class="@NavClass("Dashboard") flex-1"
+                               asp-area="@dashboardArea"
                                asp-controller="Dashboard"
                                asp-action="Index">
-
-                                <i data-lucide="layout-dashboard"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
+                                <i data-lucide="layout-dashboard" class="@iconCls" aria-hidden="true"></i>
                                 <span class="@labelCls">Dashboard</span>
                             </a>
-                        </li>
 
+                            <!-- Collapse (desktop, visible only while expanded) -->
+                            <button id="sidebarToggle"
+                                    type="button"
+                                    class="hidden size-9 shrink-0 items-center justify-center rounded text-navy/70
+                                        hover:bg-ice hover:text-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-azure lg:inline-flex"
+                                    aria-controls="adminSidebar"
+                                    aria-label="Collapse sidebar"
+                                    title="Collapse sidebar">
+                                <i data-lucide="panel-left-close" class="size-5" aria-hidden="true"></i>
+                            </button>
+                        </li>
+                    }
+
+                    <!-- Admin navigation -->
+                    @if (isAdmin)
+                    {
                         <li>
                             <a class="@NavClass("Property")"
                                title="Property"
                                asp-area="Admin"
                                asp-controller="Property"
                                asp-action="Index">
-
-                                <i data-lucide="building-2"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
+                                <i data-lucide="building-2" class="@iconCls" aria-hidden="true"></i>
                                 <span class="@labelCls">Property</span>
                             </a>
                         </li>
@@ -178,11 +180,7 @@
                                asp-area="Admin"
                                asp-controller="Developer"
                                asp-action="Index">
-
-                                <i data-lucide="building"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
+                                <i data-lucide="building" class="@iconCls" aria-hidden="true"></i>
                                 <span class="@labelCls">Developers</span>
                             </a>
                         </li>
@@ -193,11 +191,7 @@
                                asp-area="Admin"
                                asp-controller="Agent"
                                asp-action="Index">
-
-                                <i data-lucide="contact-round"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
+                                <i data-lucide="contact-round" class="@iconCls" aria-hidden="true"></i>
                                 <span class="@labelCls">Agents</span>
                             </a>
                         </li>
@@ -208,59 +202,38 @@
                                asp-area="Admin"
                                asp-controller="User"
                                asp-action="Index">
-
-                                <i data-lucide="users"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
+                                <i data-lucide="users" class="@iconCls" aria-hidden="true"></i>
                                 <span class="@labelCls">Users</span>
-                            </a>
-                        </li>
-
-                        @* <li>
-                            <a class="@NavClass("Appointment")"
-                               title="Appointments"
-                               asp-area="Admin"
-                               asp-controller="Appointment"
-                               asp-action="Index">
-
-                                <i data-lucide="notebook-text"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
-                                <span class="@labelCls">Logs</span>
-                            </a>
-                        </li> *@
-
-                        <li>
-                            <a class="@NavClass("Appointment")"
-                               title="Appointments"
-                               asp-area="Admin"
-                               asp-controller="Appointment"
-                               asp-action="Index">
-
-                                <i data-lucide="calendar-check"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
-                                <span class="@labelCls">Appointments</span>
                             </a>
                         </li>
                     }
 
                     <!-- Agent navigation -->
-                    @if (User.IsInRole(RoleSD.Agent))
+                    @if (isAgent)
                     {
                         <li>
-                            <a class="@NavClass("")"
-                               title="Listing"
-                               href="#">
+                            <a class="@NavClass("Listing")"
+                               title="My listings"
+                               asp-area="AgentAndBroker"
+                               asp-controller="Listing"
+                               asp-action="Index">
+                                <i data-lucide="clipboard-list" class="@iconCls" aria-hidden="true"></i>
+                                <span class="@labelCls">My Listing</span>
+                            </a>
+                        </li>
+                    }
 
-                                <i data-lucide="clipboard-list"
-                                   class="@iconCls"
-                                   aria-hidden="true"></i>
-
-                                <span class="@labelCls">Listing</span>
+                    <!-- Appointments (Admin sees all, Agent sees their own) -->
+                    @if (isAdmin || isAgent)
+                    {
+                        <li>
+                            <a class="@NavClass("Appointment")"
+                               title="Appointments"
+                               asp-area="Admin"
+                               asp-controller="Appointment"
+                               asp-action="Index">
+                                <i data-lucide="calendar-check" class="@iconCls" aria-hidden="true"></i>
+                                <span class="@labelCls">Appointments</span>
                             </a>
                         </li>
                     }
@@ -270,8 +243,7 @@
         </aside>
 
         <!-- Main content -->
-        <main role="main"
-              class="min-w-0 flex-1 bg-white p-4 lg:p-6">
+        <main role="main" class="min-w-0 flex-1 bg-white p-4 lg:p-6">
             @RenderBody()
         </main>
     </div>
@@ -279,13 +251,14 @@
     <!-- JavaScript dependencies -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <!-- Sweet Alert -->
+    <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Tabulator Javascript -->
+    <!-- Tabulator -->
     <script src="~/lib/tabulator/tabulator.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Sidebar functionality -->
+    <!-- Lucide: pinned version -->
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
+
+    <!-- Sidebar behavior -->
     <script>
         (function () {
         var root = document.documentElement;
@@ -293,7 +266,6 @@
         var backdrop = document.getElementById('sidebarBackdrop');
         var openBtn = document.getElementById('sidebarOpen');
         var closeBtn = document.getElementById('sidebarClose');
-        var collapseBtn = document.getElementById('sidebarToggle');
 
         function openMenu() {
         sidebar.classList.remove('-translate-x-full');
@@ -307,36 +279,25 @@
         openBtn.setAttribute('aria-expanded', 'false');
         }
 
-        if (openBtn) {
-        openBtn.addEventListener('click', openMenu);
-        }
-
-        if (closeBtn) {
-        closeBtn.addEventListener('click', closeMenu);
-        }
-
-        if (backdrop) {
-        backdrop.addEventListener('click', closeMenu);
-        }
+        if (openBtn) openBtn.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+        if (backdrop) backdrop.addEventListener('click', closeMenu);
 
         document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-        closeMenu();
-        }
+        if (e.key === 'Escape') closeMenu();
         });
 
-        if (collapseBtn) {
-        collapseBtn.addEventListener('click', function () {
+        // Collapse (in sidebar) and expand (in header) both toggle the same state
+        [document.getElementById('sidebarToggle'),
+        document.getElementById('sidebarExpand')].forEach(function (btn) {
+        if (!btn) return;
+        btn.addEventListener('click', function () {
         var collapsed = root.classList.toggle('sidebar-collapsed');
-
         try {
-        localStorage.setItem(
-        'adminSidebarCollapsed',
-        collapsed ? '1' : '0'
-        );
+        localStorage.setItem('adminSidebarCollapsed', collapsed ? '1' : '0');
         } catch (e) { }
         });
-        }
+        });
         })();
     </script>
 

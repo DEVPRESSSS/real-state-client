@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using REAL_STATE.Models;
 using REAL_STATE.Models.DTO.PropertyDTO;
@@ -8,6 +9,7 @@ using System.Diagnostics;
 
 namespace REAL_STATE.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly IPropertyService _propertyService;
