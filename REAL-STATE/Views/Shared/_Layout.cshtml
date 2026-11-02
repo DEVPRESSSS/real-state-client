@@ -71,7 +71,7 @@
                 <!-- Desktop navigation -->
                 <ul class="hidden lg:flex lg:items-center lg:gap-2">
                     <li>
-                        <a class="rounded-md px-3 py-2 text-sm transition-colors @(User.IsInRole(RoleSD.User) ? "hidden" : "visible") @NavClass("Home", "Hero")"
+                        <a class="rounded-md px-3 py-2 text-sm transition-colors) @NavClass("Home", "Hero")"
                            asp-controller="Home" asp-action="Hero">
                             Home
                         </a>
@@ -96,7 +96,7 @@
                     </li>
 
                     <li>
-                        <a class="rounded-md px-3 py-2 text-sm transition-colors @(User.IsInRole(RoleSD.User) ? "hidden" : "visible") @NavClass("Home", "Privacy")"
+                        <a class="rounded-md px-3 py-2 text-sm transition-colors @NavClass("Home", "Privacy")"
                            asp-area="" asp-controller="Home" asp-action="Privacy">
                             About Us
                         </a>

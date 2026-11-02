@@ -1,0 +1,140 @@
+﻿@using REAL_STATE.Models.VM
+@model ReferralIndexVM
+@{
+    ViewData["Title"] = "Referrals";
+
+    const string btnPrimary = "inline-flex items-center justify-center gap-2 bg-azure px-4 py-2 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+    const string btnOutline = "inline-flex items-center justify-center gap-2 border border-azure px-3 py-1.5 text-sm font-medium text-azure transition-colors hover:bg-azure hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
+    const string th = "px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-navy/60";
+    const string td = "px-3 py-3 align-middle";
+    const string badge = "inline-flex rounded bg-ice px-2 py-0.5 text-xs font-medium text-navy";
+    const string badgeSolid = "inline-flex rounded bg-azure px-2 py-0.5 text-xs font-medium text-white";
+}
+
+<div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+
+    <div class="mb-6">
+        <h1 class="mb-1 font-display text-3xl font-semibold text-navy md:text-4xl">Referrals</h1>
+        <p class="text-navy/60">Invite someone to register using your personal link.</p>
+    </div>
+
+    @if (TempData["ReferralMessage"] is string msg)
+    {
+        <div class="mb-6 flex items-start gap-3 rounded-lg border border-azure bg-ice p-4 text-navy" role="status">
+            <i data-lucide="check-circle-2" class="mt-0.5 size-5 shrink-0 text-azure" aria-hidden="true"></i>
+            <p class="text-sm">@msg</p>
+        </div>
+    }
+
+    <!-- Generate -->
+    <section class="mb-6 rounded-lg border border-ice bg-white p-6 shadow-sm" aria-labelledby="link-heading">
+        <h2 id="link-heading" class="mb-1 font-display text-lg font-semibold text-navy">Your referral link</h2>
+        <p class="mb-4 text-sm text-navy/60">
+            Each link is for one person. Generate a new one whenever you want to invite someone else.
+        </p>
+
+        @if (Model.Latest != null)
+        {
+            <div class="mb-4 flex flex-col gap-2 sm:flex-row">
+                <label for="referralLink" class="sr-only">Referral link</label>
+                <input id="referralLink" type="text" readonly value="@Model.Latest.Link"
+                       class="block w-full rounded border border-ice bg-snow px-3 py-2.5 text-sm text-navy focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
+                <button type="button" class="@btnPrimary shrink-0 js-copy" data-copy-target="referralLink">
+                    <i data-lucide="copy" class="size-4" aria-hidden="true"></i><span class="js-copy-label">Copy link</span>
+                </button>
+            </div>
+        }
+        <form asp-area="AgentAndBroker" asp-controller="Refferal" asp-action="Generate" method="post">
+            <button type="submit" class="@(Model.Latest != null ? btnOutline : btnPrimary)">
+                <i data-lucide="link" class="size-4" aria-hidden="true"></i>Generate referral link
+            </button>
+        </form>
+    </section>
+
+    <!-- History -->
+    <section class="rounded-lg border border-ice bg-white p-6 shadow-sm" aria-labelledby="history-heading">
+        <h2 id="history-heading" class="mb-4 font-display text-lg font-semibold text-navy">Your referrals</h2>
+
+        @if (Model.Referrals.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[640px] text-sm">
+                    <thead class="bg-ice">
+                        <tr>
+                            <th class="@th">Code</th>
+                            <th class="@th">Referred user</th>
+                            <th class="@th">Status</th>
+                            <th class="@th">Created</th>
+                            <th class="@th text-right">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-ice">
+                        @foreach (var r in Model.Referrals)
+                        {
+                            <tr class="hover:bg-ice/40">
+                                <td class="@td font-mono font-semibold text-navy">@r.Code</td>
+                                <td class="@td text-navy">
+                                    @if (string.IsNullOrWhiteSpace(r.ReferredName))
+                                    {
+                                        <span class="text-navy/40">&mdash;</span>
+                                    }
+                                    else
+                                    {
+                                        @r.ReferredName
+                                    }
+                                </td>
+                                <td class="@td">
+                                    <span class="@(r.Status == "Pending" ? badge : badgeSolid)">@r.Status</span>
+                                </td>
+                                <td class="@td whitespace-nowrap text-navy/60">@r.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="@td text-right">
+                                    @if (r.Status == "Pending")
+                                    {
+                                        <input type="hidden" id="link-@r.Id" value="@r.Link" />
+                                        <button type="button" class="@btnOutline js-copy" data-copy-target="link-@r.Id">
+                                            <i data-lucide="copy" class="size-4" aria-hidden="true"></i><span class="js-copy-label">Copy</span>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="py-10 text-center text-navy/60">
+                <i data-lucide="users" class="mx-auto size-10" aria-hidden="true"></i>
+                <p class="mt-2">No referrals yet. Generate a link to get started.</p>
+            </div>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('click', async function (e) {
+            var btn = e.target.closest('.js-copy');
+            if (!btn) return;
+
+            var input = document.getElementById(btn.dataset.copyTarget);
+            if (!input) return;
+
+            var label = btn.querySelector('.js-copy-label');
+            var original = label.textContent;
+
+            try {
+                await navigator.clipboard.writeText(input.value);
+                label.textContent = 'Copied';
+            } catch (err) {
+                input.type = input.type === 'hidden' ? 'text' : input.type;
+                input.select();
+                document.execCommand('copy');
+                label.textContent = 'Copied';
+            }
+
+            setTimeout(function () { label.textContent = original; }, 1500);
+        });
+    </script>
+}

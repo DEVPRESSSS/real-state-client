@@ -31,6 +31,7 @@ builder.Services.AddScoped<IDeveloperRepository, DeveloperRepository>();
 builder.Services.AddScoped<IAgentRepository, AgentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAppointmentRepository, ViewingAppointmentRepository>();
+builder.Services.AddScoped<IReferralRepository, ReferralRepository>();
 #endregion
 
 #region -- Register services
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IDeveloperService, DeveloperService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IRefferalService, ReferralService>();
 
 #endregion
 

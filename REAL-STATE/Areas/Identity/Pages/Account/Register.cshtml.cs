@@ -1,24 +1,14 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using REAL_STATE.Data;
 using REAL_STATE.Models;
+using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Utilities;
 
 namespace REAL_STATE.Areas.Identity.Pages.Account;
@@ -32,6 +22,7 @@ public class RegisterModel : PageModel
     private readonly IUserEmailStore<ApplicationUser> _emailStore;
     private readonly ILogger<RegisterModel> _logger;
     private readonly IEmailSender _emailSender;
+    private readonly IReferralRepository _referralRepo;
 
     public RegisterModel(
         UserManager<ApplicationUser> userManager,
@@ -39,7 +30,8 @@ public class RegisterModel : PageModel
         SignInManager<ApplicationUser> signInManager,
         ILogger<RegisterModel> logger,
         IEmailSender emailSender,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        IReferralRepository referralRepo)
     {
         _userManager = userManager;
         _userStore = userStore;
@@ -48,57 +40,33 @@ public class RegisterModel : PageModel
         _logger = logger;
         _emailSender = emailSender;
         _roleManager = roleManager;
-
+        _referralRepo = referralRepo;
     }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     [BindProperty]
     public InputModel Input { get; set; } = default!;
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
+    // Page-level (not inside InputModel) so it binds from ?ref=CODE on GET and from the hidden field on POST
+    [BindProperty(SupportsGet = true, Name = "ref")]
+    public string? ReferralCode { get; set; }
+
     public string? ReturnUrl { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public IList<AuthenticationScheme>? ExternalLogins { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public class InputModel
     {
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; } = default!;
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; } = default!;
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
@@ -108,9 +76,7 @@ public class RegisterModel : PageModel
         [StringLength(100)]
         [Display(Name = "Full name")]
         public string FullName { get; set; } = string.Empty;
-
     }
-
 
     public async Task OnGetAsync(string? returnUrl = null)
     {
@@ -145,11 +111,23 @@ public class RegisterModel : PageModel
                 }
                 await _userManager.AddToRoleAsync(user, RoleSD.User);
 
+                if (!string.IsNullOrWhiteSpace(ReferralCode))
+                {
+                    try
+                    {
+                        var credited = await _referralRepo.RedeemAsync(ReferralCode.Trim(), user.Id);
+                        if (!credited)
+                            _logger.LogInformation("Referral code was invalid or already used.");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to redeem referral code for user {UserId}.", user.Id);
+                    }
+                }
+
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-
 
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmail",
@@ -176,7 +154,6 @@ public class RegisterModel : PageModel
             }
         }
 
-        // If we got this far, something failed, redisplay form
         return Page();
     }
 

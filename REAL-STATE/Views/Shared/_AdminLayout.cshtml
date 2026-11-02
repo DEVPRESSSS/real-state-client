@@ -23,11 +23,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>@ViewData["Title"] - SHR</title>
-
     <script type="importmap"></script>
-
+    <link rel="icon" href="~/Logo.ico" />
     <!-- Tabulator base CSS first, then Tailwind -->
     <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
@@ -210,6 +208,16 @@
                                asp-action="Index">
                                 <i data-lucide="clipboard-list" class="@iconCls" aria-hidden="true"></i>
                                 <span class="@labelCls">My Listing</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="@NavClass("Refferal")"
+                               title="My Referrals"
+                               asp-area="AgentAndBroker"
+                               asp-controller="Refferal"
+                               asp-action="Index">
+                                <i data-lucide="clipboard-list" class="@iconCls" aria-hidden="true"></i>
+                                <span class="@labelCls">Referrals</span>
                             </a>
                         </li>
                     }
