@@ -26,48 +26,43 @@ namespace REAL_STATE.Services
 
         public async Task AddProperty(PropertyVM vm)
         {
-            await _propertyRepository.AddAsync(vm.Property);
+            await ValidateReferencesAsync(vm.Property);
+            var property = new REAL_STATE.Models.Property();
+            vm.Property.ApplyTo(property);
+            await _propertyRepository.AddAsync(property);
             await _propertyRepository.Save();
         }
+
         public async Task UpdateProperty(PropertyVM vm)
         {
-            var prop = await _propertyRepository.GetAsync(x => x.Id == vm.Property.Id);
-            if (prop is null)
-                throw new GlobalExceptionHandler("Property not found!!");
-
-            var input = vm.Property;
-
-            prop.DeveloperId = input.DeveloperId;
-            prop.AgentId = string.IsNullOrWhiteSpace(input.AgentId) ? null : input.AgentId;
-            prop.Title = input.Title;
-            prop.Slug = input.Slug;
-            prop.Description = input.Description;
-            prop.PropertyType = input.PropertyType;
-            prop.ListingType = input.ListingType;
-            prop.Price = input.Price;
-            prop.FloorAreaSqFt = input.FloorAreaSqFt;
-            prop.Bedrooms = input.Bedrooms;
-            prop.Bathrooms = input.Bathrooms;
-            prop.Address = input.Address;
-            prop.City = input.City;
-            prop.Province = input.Province;
-            prop.Country = input.Country;
-            prop.Status = input.Status;
-            prop.IsFeatured = input.IsFeatured;
-            prop.UpdatedAt = DateTime.UtcNow;
-
-            var slugTaken = (await _propertyRepository.GetAllAsync(x => x.Slug == input.Slug && x.Id != input.Id)).Any();
-            if (slugTaken)
-                throw new GlobalExceptionHandler("Slug is already in use.");
-
-            await _propertyRepository.UpdateAsync(prop);
+            await ValidateReferencesAsync(vm.Property);
+            var property = await _propertyRepository.GetAsync(x => x.Id == vm.Property.Id, tracked: true)
+                ?? throw new GlobalExceptionHandler("Property not found.");
+            vm.Property.ApplyTo(property);
+            property.UpdatedAt = DateTime.UtcNow;
             await _propertyRepository.Save();
         }
-        public async Task<List<FilterPropertyDTO>> Filter(CriteriaDTO? criteriaDTO)
+
+        private async Task ValidateReferencesAsync(PropertyInput input)
+        {
+            var errors = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            if (!System.ComponentModel.DataAnnotations.Validator.TryValidateObject(input,
+                new System.ComponentModel.DataAnnotations.ValidationContext(input), errors, true))
+                throw new GlobalExceptionHandler(string.Join(" ", errors.Select(e => e.ErrorMessage)));
+            if (!await _context.Developers.AnyAsync(d => d.Id == input.DeveloperId && d.IsActive))
+                throw new GlobalExceptionHandler("Select an active developer.");
+            if (!string.IsNullOrWhiteSpace(input.AgentId) &&
+                !await _context.Agents.AnyAsync(a => a.Id == input.AgentId && a.IsActive))
+                throw new GlobalExceptionHandler("Select an active agent.");
+            if (await _context.Properties.AnyAsync(p => p.Slug == input.Slug && p.Id != input.Id))
+                throw new GlobalExceptionHandler("Slug is already in use.");
+        }
+
+        public async Task<PagedResult<FilterPropertyDTO>> Filter(CriteriaDTO? criteriaDTO)
         {
             var query = _context.Properties
                 .AsNoTracking()
-                .Where(p => p.Status == "Available"); 
+                .Where(p => p.Status == "Available");
 
             if (criteriaDTO != null)
             {
@@ -79,14 +74,14 @@ namespace REAL_STATE.Services
 
                 if (!string.IsNullOrWhiteSpace(criteriaDTO.City))
                 {
-                    var city = criteriaDTO.City.Trim().ToLower();
-                    query = query.Where(p => p.City.ToLower().Contains(city));
+                    var city = criteriaDTO.City.Trim();
+                    query = query.Where(p => p.City.StartsWith(city));
                 }
 
                 if (!string.IsNullOrWhiteSpace(criteriaDTO.PropertyType))
                 {
-                    var type = criteriaDTO.PropertyType.Trim().ToLower();
-                    query = query.Where(p => p.PropertyType.ToLower().Contains(type));
+                    var type = criteriaDTO.PropertyType.Trim();
+                    query = query.Where(p => p.PropertyType == type);
                 }
 
                 if (criteriaDTO.MinPrice.HasValue)
@@ -102,6 +97,7 @@ namespace REAL_STATE.Services
             return await query
                 .OrderByDescending(p => p.IsFeatured)
                 .ThenByDescending(p => p.CreatedAt)
+                .ThenBy(p => p.Id)
                 .Select(p => new FilterPropertyDTO
                 {
                     Id = p.Id,
@@ -117,7 +113,7 @@ namespace REAL_STATE.Services
                     City = p.City,
                     Province = p.Province,
                     IsFeatured = p.IsFeatured,
-                    DeveloperName = p.Developer.Name,
+                    DeveloperName = p.Developer != null ? p.Developer.Name : "",
                     PrimaryImageUrl = p.Images
                         .OrderByDescending(i => i.IsPrimary)
                         .ThenBy(i => i.DisplayOrder)
@@ -129,15 +125,13 @@ namespace REAL_STATE.Services
                         .Select(i => i.AltText)
                         .FirstOrDefault()
                 })
-                .ToListAsync();
+                .ToPageAsync(criteriaDTO?.Page ?? 1, criteriaDTO?.PageSize ?? 12);
         }
 
         public async Task<PropertyDetailsVM?> GetDetails(string id)
         {
-            var property = (await _propertyRepository.GetAllAsync(
-                    x => x.Id == id,
-                    includeProperties: "Developer,Agent"))
-                .FirstOrDefault();
+            var property = await _propertyRepository.GetAsync(x => x.Id == id,
+                includeProperties: "Developer,Agent,Images");
 
             if (property == null)
                 return null;

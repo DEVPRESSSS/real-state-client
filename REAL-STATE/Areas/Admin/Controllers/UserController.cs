@@ -10,23 +10,27 @@ using REAL_STATE.Utilities;
 namespace REAL_STATE.Areas.Admin.Controllers
 {
     [Area(RoleSD.Admin)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [Authorize(Roles = RoleSD.Admin)]
     public class UserController : Controller
     {
+        private readonly REAL_STATE.Utilities.SafeErrorMessages _errors;
         private readonly IUserService _userService;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserController(IUserService userService, RoleManager<IdentityRole> roleManager)
+        public UserController(IUserService userService, RoleManager<IdentityRole> roleManager,
+            SafeErrorMessages errors)
         {
+            _errors = errors;
             _userService = userService;
             _roleManager = roleManager;
         }
 
         private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 20, string? q = null)
         {
-            var users = await _userService.GetAllUsers(CurrentUserId);
+            var users = await _userService.GetAllUsers(CurrentUserId, page, pageSize, q?.Trim());
             return View(users);
         }
 
@@ -77,7 +81,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 // Stay on the form so the admin doesn't lose what they typed
-                ModelState.AddModelError(string.Empty, ex.Message);
+                ModelState.AddModelError(string.Empty, _errors.For(ex));
                 LoadRoles(vm);
                 return View(vm);
             }
@@ -100,7 +104,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = _errors.For(ex) });
             }
         }
 

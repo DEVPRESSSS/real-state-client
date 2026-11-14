@@ -7,7 +7,7 @@ namespace REAL_STATE.Services.Interfaces
 {
     public interface IPropertyService
     {
-        Task<List<FilterPropertyDTO>> Filter(CriteriaDTO criteriaDTO);
+        Task<PagedResult<FilterPropertyDTO>> Filter(CriteriaDTO criteriaDTO);
         Task AddProperty(PropertyVM vm);
         Task UpdateProperty(PropertyVM vm);
         Task<PropertyDetailsVM?> GetDetails(string id);

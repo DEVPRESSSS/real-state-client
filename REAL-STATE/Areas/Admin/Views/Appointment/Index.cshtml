@@ -24,6 +24,7 @@
 
 
 @Html.AntiForgeryToken()
+<partial name="_Pagination" model="Model" />
 
 <!-- Page Header -->
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -57,7 +58,7 @@
 
                     <input id="appointmentSearch"
                            type="search"
-                           placeholder="Search appointments"
+                           placeholder="Filter this page"
                            class="block w-full rounded border border-ice bg-white py-2 pl-9 pr-3 text-sm text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
                 </div>
             </div>

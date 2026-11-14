@@ -1,5 +1,6 @@
 ﻿@using REAL_STATE.Models.VM
-@model IEnumerable<DeveloperCardVM>
+@model REAL_STATE.Models.VM.PagedResult<DeveloperCardVM>
+<partial name="_Pagination" model="Model" />
 @{
     ViewData["Title"] = "Developers";
 }
@@ -16,10 +17,10 @@
 <section >
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 
-        @if (Model != null && Model.Any())
+        @if (Model != null && Model.Items.Any())
         {
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                @foreach (var d in Model)
+                @foreach (var d in Model.Items)
                 {
                     <article class="flex h-full flex-col rounded-lg border border-ice bg-white p-4 shadow-sm">
 
@@ -54,7 +55,7 @@
                             <span class="text-navy">@d.AvailableListings available</span>
                         </div>
 
-                        @if (!string.IsNullOrWhiteSpace(d.WebsiteUrl))
+                        @if (REAL_STATE.Utilities.HttpUrlAttribute.IsHttpUrl(d.WebsiteUrl))
                         {
                             <a href="@d.WebsiteUrl" target="_blank" rel="noopener noreferrer"
                                class="inline-flex items-center justify-center gap-1 bg-azure px-4 py-2 text-center font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">

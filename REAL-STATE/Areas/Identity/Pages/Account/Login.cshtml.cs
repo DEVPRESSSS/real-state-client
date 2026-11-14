@@ -31,7 +31,7 @@ public class LoginModel : PageModel
         ILogger<LoginModel> logger)
     {
         _signInManager = signInManager;
-        _userManager =userManager; 
+        _userManager =userManager;
         _logger = logger;
     }
 
@@ -116,9 +116,9 @@ public class LoginModel : PageModel
 
         if (ModelState.IsValid)
         {
-           
-            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, 
-               Input.RememberMe, lockoutOnFailure: false);
+
+            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password,
+               Input.RememberMe, lockoutOnFailure: true);
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");

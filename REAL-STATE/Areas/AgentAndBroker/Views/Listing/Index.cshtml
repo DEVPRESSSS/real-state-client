@@ -1,12 +1,12 @@
 ﻿@using REAL_STATE.Models
-@model IEnumerable<Property>
+@model REAL_STATE.Models.VM.PagedResult<Property>
 @{
     ViewData["Title"] = "My listings";
     var isActive = ViewBag.IsAgentActive as bool? ?? false;
 
     const string btnPrimary = "inline-flex items-center gap-2 bg-azure px-4 py-2 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
 
-    var rows = (Model ?? Enumerable.Empty<Property>()).Select(p => new
+    var rows = Model.Items.Select(p => new
     {
         id = p.Id,
         title = p.Title,
@@ -22,10 +22,12 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
-    <link rel="stylesheet" href="~/css/tabulator-theme.css" asp-append-version="true" />
+
 }
 
 @Html.AntiForgeryToken()
+<partial name="_TableSearch" />
+<partial name="_Pagination" model="Model" />
 
 @if (!isActive)
 {
@@ -57,7 +59,7 @@
                 <label for="listingSearch" class="sr-only">Search listings</label>
                 <div class="relative">
                     <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-navy/50" aria-hidden="true"></i>
-                    <input id="listingSearch" type="search" placeholder="Search listings"
+                    <input id="listingSearch" type="search" placeholder="Filter this page"
                            class="block w-full rounded border border-ice bg-white py-2 pl-9 pr-3 text-sm text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30" />
                 </div>
             </div>

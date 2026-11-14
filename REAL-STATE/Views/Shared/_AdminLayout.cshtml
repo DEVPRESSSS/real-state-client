@@ -29,12 +29,12 @@
     <!-- Tabulator base CSS first, then Tailwind -->
     <link rel="stylesheet" href="~/lib/tabulator/tabulator.min.css" />
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/REAL_STATE.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/REAL-STATE.styles.css" asp-append-version="true" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -50,7 +50,7 @@
                 <!-- Sidebar toggle (mobile) -->
                 <button id="sidebarOpen"
                         type="button"
-                        class="inline-flex size-10 items-center justify-center rounded text-navy hover:bg-ice 
+                        class="inline-flex size-10 items-center justify-center rounded text-navy hover:bg-ice
                         focus:outline-none focus-visible:ring-2 focus-visible:ring-azure lg:hidden"
                         aria-controls="adminSidebar"
                         aria-expanded="false"
@@ -73,7 +73,7 @@
                    asp-area="@dashboardArea"
                    asp-controller="Dashboard"
                    asp-action="Index">
-                   
+
                     <img class="h-12 w-auto max-w-[220px] object-contain"
                          src="/images/Logo.png"
                          alt="SouthernHomesRealty" />
@@ -249,18 +249,14 @@
 
     <!-- JavaScript dependencies -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/table-utils.js" asp-append-version="true"></script>
     <script src="~/js/site-admin.js" asp-append-version="true"></script>
     <!-- SweetAlert -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js" asp-append-version="true"></script>
     <!-- Tabulator -->
-    <script src="~/lib/tabulator/tabulator.min.js"></script>
     <!-- Lucide: pinned version -->
-    <script src="https://unpkg.com/lucide@0.469.0"></script>
+    <script src="~/lib/lucide/lucide.min.js" asp-append-version="true"></script>
 
-    <!-- Sidebar behavior -->
-    <script>
-        
-    </script>
 
     <!-- Success notification -->
     @if (TempData["SuccessMessage"] is string successMsg)

@@ -21,12 +21,12 @@ namespace REAL_STATE.Areas.Identity.Pages.Account;
 public class ResendEmailConfirmationModel : PageModel
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IEmailSender _emailSender;
+    private readonly REAL_STATE.Services.Interfaces.IAccountConfirmationService _confirmation;
 
-    public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+    public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, REAL_STATE.Services.Interfaces.IAccountConfirmationService confirmation)
     {
         _userManager = userManager;
-        _emailSender = emailSender;
+        _confirmation = confirmation;
     }
 
     /// <summary>
@@ -69,18 +69,7 @@ public class ResendEmailConfirmationModel : PageModel
             return Page();
         }
 
-        var userId = await _userManager.GetUserIdAsync(user);
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = Url.Page(
-            "/Account/ConfirmEmail",
-            pageHandler: null,
-            values: new { userId = userId, code = code },
-            protocol: Request.Scheme)!;
-        await _emailSender.SendEmailAsync(
-            Input.Email,
-            "Confirm your email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+        if (!user.EmailConfirmed) await _confirmation.SendAsync(user);
 
         ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
         return Page();

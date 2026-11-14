@@ -1,0 +1,12 @@
+<form method="get" class="my-4 flex items-center gap-3" role="search">
+    <label for="serverSearch">Search all records</label>
+    <input id="serverSearch" name="q" type="search" maxlength="200" value="@Context.Request.Query["q"]" />
+    <label for="pageSize">Rows per page</label>
+    <select id="pageSize" name="pageSize">
+        @foreach (var size in new[] { 10, 20, 25, 50, 100 })
+        {
+            <option value="@size" selected="@(Context.Request.Query["pageSize"].ToString() == size.ToString() || string.IsNullOrEmpty(Context.Request.Query["pageSize"]) && size == 20)">@size</option>
+        }
+    </select>
+    <button type="submit">Search</button>
+</form>

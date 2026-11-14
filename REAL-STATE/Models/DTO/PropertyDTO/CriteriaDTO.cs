@@ -2,7 +2,9 @@
 {
     public class CriteriaDTO
     {
-        public string? ListingType { get; set; }   
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 12;
+        public string? ListingType { get; set; }
         public string? City { get; set; }
         public string? PropertyType { get; set; }
         public decimal? MinPrice { get; set; }

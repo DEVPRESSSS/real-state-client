@@ -5,7 +5,7 @@ namespace REAL_STATE.Models.VM
 {
     public class PropertyVM
     {
-        public Property Property { get; set; } = new();
+        public PropertyInput Property { get; set; } = new();
         [ValidateNever]
         public bool IsEdit { get; set; }
 

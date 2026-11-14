@@ -29,9 +29,7 @@
         data: data,
         index: 'id',
         layout: 'fitColumns',
-        pagination: true,
-        paginationSize: 10,
-        paginationSizeSelector: [10, 25, 50],
+        pagination: false,
         placeholder: 'No matching agents found.',
         columns: [
             {
@@ -92,7 +90,7 @@
     }
 
     if (search) {
-        search.addEventListener('input', function () {
+        search.addEventListener('input', tableUtils.debounce(function () {
             var term = search.value.trim().toLowerCase();
             if (!term) { table.clearFilter(); return; }
             table.setFilter(function (row) {
@@ -100,10 +98,10 @@
                     return String(row[f] || '').toLowerCase().indexOf(term) !== -1;
                 });
             });
-        });
+        }, 200));
     }
 
-    table.on('renderComplete', function () { if (window.lucide) lucide.createIcons(); });
+    table.on('renderComplete', function () { if (window.lucide) tableUtils.icons(el); });
     table.on('tableBuilt', updateCount);
     table.on('dataFiltered', updateCount);
 })();

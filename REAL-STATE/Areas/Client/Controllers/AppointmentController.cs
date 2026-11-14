@@ -30,6 +30,7 @@ namespace REAL_STATE.Controllers
         }
 
         [HttpPost]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting(REAL_STATE.Utilities.RateLimitConfiguration.PublicWrites)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ScheduleAppointmentVM vm)
         {
@@ -40,7 +41,7 @@ namespace REAL_STATE.Controllers
             foreach (var (key, message) in result.Errors)
                 ModelState.AddModelError(key, message);
 
-            if (!result.Success) return View(vm); 
+            if (!result.Success) return View(vm);
 
             var appointment = result.Appointment!;
             TempData["Viewing.Property"] = result.PropertyTitle;

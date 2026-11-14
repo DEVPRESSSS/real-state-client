@@ -36,6 +36,6 @@ namespace REAL_STATE.Services.Interfaces
            string userId
        );
 
-        Task<(bool Success, string Message)> ApprovedOrRejectAppoinment(string appointmentId);
+        Task<(bool Success, string Message)> ApproveAsync(string appointmentId, ClaimsPrincipal user);
     }
 }

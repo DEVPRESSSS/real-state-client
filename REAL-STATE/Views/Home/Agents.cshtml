@@ -202,8 +202,8 @@
                                 else
                                 {
                                     <a class="@pageBase rounded-l-lg"
-                                       asp-controller="Agents"
-                                       asp-action="Index"
+                                       asp-controller="Home"
+                                       asp-action="Agents"
                                        asp-route-page="@(Model.Page - 1)"
                                        aria-label="Previous">
 
@@ -228,8 +228,8 @@
                             {
                                 <li>
                                     <a class="@pageBase"
-                                       asp-controller="Agents"
-                                       asp-action="Index"
+                                       asp-controller="Home"
+                                       asp-action="Agents"
                                        asp-route-page="1">
                                         1
                                     </a>
@@ -256,8 +256,8 @@
                                     else
                                     {
                                         <a class="@pageBase"
-                                           asp-controller="Agents"
-                                           asp-action="Index"
+                                           asp-controller="Home"
+                                           asp-action="Agents"
                                            asp-route-page="@i">
                                             @i
                                         </a>
@@ -277,8 +277,8 @@
 
                                 <li>
                                     <a class="@pageBase"
-                                       asp-controller="Agents"
-                                       asp-action="Index"
+                                       asp-controller="Home"
+                                       asp-action="Agents"
                                        asp-route-page="@Model.TotalPages">
                                         @Model.TotalPages
                                     </a>
@@ -308,8 +308,8 @@
                                 else
                                 {
                                     <a class="@pageBase rounded-r-lg"
-                                       asp-controller="Agents"
-                                       asp-action="Index"
+                                       asp-controller="Home"
+                                       asp-action="Agents"
                                        asp-route-page="@(Model.Page + 1)"
                                        aria-label="Next">
 
@@ -372,4 +372,3 @@
 
         </div>
     </section>
-

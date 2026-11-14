@@ -5,12 +5,13 @@ namespace REAL_STATE.Repositories.IRepositories
 {
     public interface IAppointmentRepository: IRepository<ViewingAppointment>
     {
+        Task<bool> ApproveAsync(string appointmentId, string userId, bool isAdmin);
         Task<PagedResult<AppointmentListVM>> GetPagedAsync(
             int page,
             int pageSize
         );
 
-        Task<PagedResult<AppointmentListVM>> GetPagedAppointentForAgentAsync(
+        Task<PagedResult<AppointmentListVM>> GetPagedForAgentAsync(
              int page,
              int pageSize,
              string userId

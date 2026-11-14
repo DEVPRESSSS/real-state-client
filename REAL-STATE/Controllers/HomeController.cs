@@ -1,3 +1,4 @@
+using REAL_STATE.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using REAL_STATE.Models;
@@ -12,17 +13,19 @@ namespace REAL_STATE.Controllers
     [AllowAnonymous]
     public class HomeController : Controller
     {
+        private readonly REAL_STATE.Utilities.SafeErrorMessages _errors;
         private readonly IPropertyService _propertyService;
         private readonly IDeveloperService _developerService;
         private readonly IAgentService _agentService;
-        private const int PageSize = 10;  
+        private const int PageSize = 10;
 
         public HomeController(IPropertyService propertyService,
-            
+
             IAgentService agentService,
-            IDeveloperService developerService
-            )
+            IDeveloperService developerService,
+            REAL_STATE.Utilities.SafeErrorMessages errors)
         {
+            _errors = errors;
             _propertyService = propertyService;
             _agentService = agentService;
             _developerService= developerService;
@@ -52,6 +55,7 @@ namespace REAL_STATE.Controllers
         public IActionResult Register() => View(new AgentRegisterVM());
 
         [HttpPost]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting(REAL_STATE.Utilities.RateLimitConfiguration.PublicWrites)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(AgentRegisterVM vm)
         {
@@ -64,11 +68,11 @@ namespace REAL_STATE.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                ModelState.AddModelError(string.Empty, _errors.For(ex));
                 return View(vm);
             }
 
-            TempData["SuccessMessage"] = "Registration received. An admin will review and activate your profile.";
+            TempData["SuccessMessage"] = "Registration received. Check your email to confirm your account. An admin will review your profile.";
             return RedirectToAction(nameof(Index));
         }
         public async Task<IActionResult> Details(string id)
@@ -83,9 +87,9 @@ namespace REAL_STATE.Controllers
             return View(vm);
         }
 
-        public async Task<IActionResult> Developers()
+        public async Task<IActionResult> Developers(int page = 1)
         {
-            var developers = await _developerService.GetActiveDevelopers();
+            var developers = await _developerService.GetActiveDevelopers(page);
             return View(developers);
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -7,6 +7,7 @@
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? Phone { get; set; }
+        [REAL_STATE.Utilities.HttpUrl]
         public string? PhotoUrl { get; set; }
         public string? Bio { get; set; }
         public string? LicenseNumber { get; set; }

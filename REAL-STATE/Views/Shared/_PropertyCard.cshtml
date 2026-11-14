@@ -9,8 +9,9 @@
 
 <article class="relative flex h-full flex-col overflow-hidden rounded-lg  bg-white border border-ice shadow-sm">
 
-   
-        <img src="~/images/condo.jpg"
+
+        <img src="@(REAL_STATE.Utilities.HttpUrlAttribute.IsHttpUrl(Model.PrimaryImageUrl) ? Model.PrimaryImageUrl : Url.Content("~/images/condo.jpg"))"
+             width="800" height="600" decoding="async"
              alt="@(string.IsNullOrWhiteSpace(Model.PrimaryImageAlt) ? Model.Title : Model.PrimaryImageAlt)"
              class="aspect-[4/3] w-full object-cover"
              loading="lazy" />
@@ -51,9 +52,9 @@
         </ul>
 
         <a asp-area="" asp-controller="Home" asp-action="Details" asp-route-id="@Model.Id"
-           class="mt-auto block rounded-lg border border-navy px-4 py-2 text-center font-medium 
+           class="mt-auto block rounded-lg border border-navy px-4 py-2 text-center font-medium
                 text-navy transition-colors hover:bg-azure
-                hover:text-white focus:outline-none focus-visible:ring-2 
+                hover:text-white focus:outline-none focus-visible:ring-2
                 focus-visible:ring-green-600 focus-visible:ring-offset-2 after:absolute after:inset-0">
             View details
         </a>

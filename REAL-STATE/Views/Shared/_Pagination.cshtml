@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.WebUtilities
+@model REAL_STATE.Models.VM.IPageInfo
+@{
+    string PageUrl(int page)
+    {
+        var query = Context.Request.Query.ToDictionary(q => q.Key, q => (string?)q.Value.ToString(), StringComparer.OrdinalIgnoreCase);
+        query["page"] = page.ToString();
+        query["pageSize"] = Model.PageSize.ToString();
+        return QueryHelpers.AddQueryString(Context.Request.PathBase + Context.Request.Path, query);
+    }
+}
+<nav aria-label="Pagination" class="my-4 flex items-center justify-between gap-4">
+    <span>@Model.TotalItems results � Page @Model.CurrentPage of @Math.Max(1, Model.TotalPages)</span>
+    @if (Model.HasPreviousPage) { <a href="@PageUrl(Model.CurrentPage - 1)" rel="prev">Previous</a> }
+    @if (Model.HasNextPage) { <a href="@PageUrl(Model.CurrentPage + 1)" rel="next">Next</a> }
+</nav>

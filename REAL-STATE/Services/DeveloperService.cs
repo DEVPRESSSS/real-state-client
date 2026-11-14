@@ -13,29 +13,31 @@ namespace REAL_STATE.Services
     public class DeveloperService:IDeveloperService
     {
         private readonly IDeveloperRepository _developerRepository;
+        private readonly ApplicationDbContext _db;
 
         public DeveloperService(
-            IDeveloperRepository developerRepository
+            IDeveloperRepository developerRepository, ApplicationDbContext db
 
             )
         {
             _developerRepository = developerRepository;
+            _db = db;
         }
 
         public async Task AddDeveloper(Developers developer)
         {
-            await _developerRepository.AddAsync(developer);
+            System.ComponentModel.DataAnnotations.Validator.ValidateObject(developer,
+                new System.ComponentModel.DataAnnotations.ValidationContext(developer), true);
+            await _developerRepository.AddAsync(new Developers { Name = developer.Name, Slug = developer.Slug,
+                Description = developer.Description, WebsiteUrl = developer.WebsiteUrl,
+                LogoUrl = developer.LogoUrl, IsActive = developer.IsActive });
             await _developerRepository.Save();
         }
 
-        public async Task<List<DeveloperCardVM>> GetActiveDevelopers()
+        public async Task<PagedResult<DeveloperCardVM>> GetActiveDevelopers(int page = 1, int pageSize = 12)
         {
-            var developers = await _developerRepository.GetAllAsync(
-                x => x.IsActive,
-                includeProperties: "Properties");
-
-            return developers
-                .OrderBy(x => x.Name)
+            return await _db.Developers.AsNoTracking().Where(d => d.IsActive)
+                .OrderBy(d => d.Name).ThenBy(d => d.Id)
                 .Select(d => new DeveloperCardVM
                 {
                     Id = d.Id,
@@ -45,16 +47,18 @@ namespace REAL_STATE.Services
                     WebsiteUrl = d.WebsiteUrl,
                     AvailableListings = d.Properties.Count(p => p.Status == "Available")
                 })
-                .ToList();
+                .ToPageAsync(page, pageSize);
         }
 
         public async Task UpdateDeveloper(Developers developer)
         {
+            System.ComponentModel.DataAnnotations.Validator.ValidateObject(developer,
+                new System.ComponentModel.DataAnnotations.ValidationContext(developer), true);
             var developerObj = await _developerRepository.GetAsync(x => x.Id == developer.Id);
             if (developerObj is null)
                 throw new GlobalExceptionHandler("Developer not found!!");
 
-            var slugTaken = (await _developerRepository.GetAllAsync(x => x.Slug == developer.Slug && x.Id != developer.Id)).Any();
+            var slugTaken = await _developerRepository.GetAsync(x => x.Slug == developer.Slug && x.Id != developer.Id) != null;
             if (slugTaken)
                 throw new GlobalExceptionHandler("Slug is already in use.");
 

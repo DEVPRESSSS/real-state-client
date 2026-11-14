@@ -14,26 +14,34 @@ namespace REAL_STATE.Services
     public class AgentService:IAgentService
     {
         private readonly IAgentRepository _agentRepository;
+        private readonly ApplicationDbContext _db;
+        private readonly IAccountConfirmationService _confirmation;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         public AgentService(
             IAgentRepository agentRepository,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager
+            ApplicationDbContext db, IAccountConfirmationService confirmation
             )
         {
             _agentRepository = agentRepository;
+            _db = db;
+            _confirmation = confirmation;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         public async Task AddAgent(Agent agent)
         {
-            await _agentRepository.AddAsync(agent);
+            System.ComponentModel.DataAnnotations.Validator.ValidateObject(agent,
+                new System.ComponentModel.DataAnnotations.ValidationContext(agent), true);
+            await _agentRepository.AddAsync(new Agent { FullName = agent.FullName, Email = agent.Email,
+                Phone = agent.Phone, Bio = agent.Bio, LicenseNumber = agent.LicenseNumber,
+                Role = agent.Role, IsActive = agent.IsActive, PhotoUrl = agent.PhotoUrl });
             await _agentRepository.Save();
         }
         public async Task UpdateAgent(Agent agent)
         {
+            System.ComponentModel.DataAnnotations.Validator.ValidateObject(agent,
+                new System.ComponentModel.DataAnnotations.ValidationContext(agent), true);
             var agentObj = await _agentRepository.GetAsync(x => x.Id == agent.Id);
             if (agentObj is null)
                 throw new GlobalExceptionHandler("Agent not found!!");
@@ -55,52 +63,27 @@ namespace REAL_STATE.Services
 
         public async Task<PagedAgentsVM> GetAgentsPage(int page, int pageSize = 10)
         {
-            var agents = (await _agentRepository.GetAllAsync(
-                    x => x.IsActive,
-                    includeProperties: "Properties"))
-                .OrderBy(x => x.FullName)
-                .ToList();
-
-            var totalItems = agents.Count;
-            var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
-            page = Math.Clamp(page, 1, totalPages);
-
-            var cards = agents
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(a =>
+            var result = await _db.Agents.AsNoTracking().Where(a => a.IsActive)
+                .OrderBy(a => a.FullName).ThenBy(a => a.Id).Select(a => new AgentCardVM
                 {
-                    var available = a.Properties.Where(p => p.Status == "Available").ToList();
-
-                    var area = available
-                        .Where(p => !string.IsNullOrWhiteSpace(p.City))
-                        .GroupBy(p => p.City)
-                        .OrderByDescending(g => g.Count())
-                        .Take(2)
-                        .Select(g => g.Key)
-                        .ToList();
-
-                    return new AgentCardVM
-                    {
-                        Id = a.Id,
-                        FullName = a.FullName,
-                        Role = a.Role,
-                        PhotoUrl = a.PhotoUrl,
-                        Email = a.Email,
-                        IsVerified = !string.IsNullOrWhiteSpace(a.LicenseNumber),
-                        Area = area.Any() ? string.Join(" & ", area) : "-",
-                        ActiveListings = available.Count
-                    };
-                })
-                .ToList();
-
-            return new PagedAgentsVM
+                    Id = a.Id, FullName = a.FullName, Role = a.Role, PhotoUrl = a.PhotoUrl,
+                    Email = a.Email, IsVerified = a.LicenseNumber != null && a.LicenseNumber != "",
+                    ActiveListings = a.Properties.Count(p => p.Status == "Available")
+                }).ToPageAsync(page, pageSize);
+            var cards = result.Items.ToList();
+            var ids = cards.Select(a => a.Id).ToList();
+            var areas = await _db.Properties.AsNoTracking()
+                .Where(p => p.AgentId != null && ids.Contains(p.AgentId) && p.Status == "Available" && p.City != "")
+                .GroupBy(p => new { p.AgentId, p.City })
+                .Select(g => new { g.Key.AgentId, g.Key.City, Count = g.Count() }).ToListAsync();
+            foreach (var card in cards)
             {
-                Agents = cards,
-                Page = page,
-                PageSize = pageSize,
-                TotalItems = totalItems
-            };
+                var cities = areas.Where(a => a.AgentId == card.Id).OrderByDescending(a => a.Count)
+                    .ThenBy(a => a.City).Take(2).Select(a => a.City).ToList();
+                card.Area = cities.Count == 0 ? "-" : string.Join(" & ", cities);
+            }
+            return new PagedAgentsVM { Agents = cards, Page = result.CurrentPage,
+                PageSize = result.PageSize, TotalItems = result.TotalItems };
         }
 
         public async Task RegisterAgent(AgentRegisterVM vm)
@@ -108,12 +91,11 @@ namespace REAL_STATE.Services
             if (await _userManager.FindByEmailAsync(vm.Email) != null)
                 throw new GlobalExceptionHandler("Email is already registered.");
 
-            var emailUsedByAgent = (await _agentRepository.GetAllAsync(x => x.Email == vm.Email)).Any();
+            var emailUsedByAgent = await _agentRepository.GetAsync(x => x.Email == vm.Email) != null;
             if (emailUsedByAgent)
                 throw new GlobalExceptionHandler("An agent with this email already exists.");
 
-            if (!await _roleManager.RoleExistsAsync(RoleSD.Agent))
-                await _roleManager.CreateAsync(new IdentityRole(RoleSD.Agent));
+            await using var transaction = await _db.Database.BeginTransactionAsync();
 
             var user = new ApplicationUser
             {
@@ -121,7 +103,7 @@ namespace REAL_STATE.Services
                 Email = vm.Email,
                 FullName = vm.FullName,
                 PhoneNumber = vm.Phone,
-                EmailConfirmed = true   
+                EmailConfirmed = false
             };
 
             var result = await _userManager.CreateAsync(user, vm.Password);
@@ -130,7 +112,7 @@ namespace REAL_STATE.Services
 
             try
             {
-                await _userManager.AddToRoleAsync(user, RoleSD.Agent);
+                (await _userManager.AddToRoleAsync(user, RoleSD.Agent)).ThrowIfFailed();
 
                 var agent = new Agent
                 {
@@ -141,17 +123,19 @@ namespace REAL_STATE.Services
                     LicenseNumber = vm.LicenseNumber,
                     Bio = vm.Bio,
                     Role = "Agent",
-                    IsActive = false   
+                    IsActive = false
                 };
 
                 await _agentRepository.AddAsync(agent);
                 await _agentRepository.Save();
+                await transaction.CommitAsync();
             }
             catch
             {
-                await _userManager.DeleteAsync(user);
+                await transaction.RollbackAsync();
                 throw;
             }
+            await _confirmation.SendAsync(user);
         }
     }
 }

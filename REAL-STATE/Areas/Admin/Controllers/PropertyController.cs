@@ -10,9 +10,11 @@ using REAL_STATE.Utilities;
 namespace REAL_STATE.Areas.Admin.Controllers
 {
     [Area(RoleSD.Admin)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [Authorize(Roles = RoleSD.Admin)]
     public class PropertyController : Controller
     {
+        private readonly REAL_STATE.Utilities.SafeErrorMessages _errors;
         private readonly IPropertyRepository _propertyRepository;
         private readonly IDeveloperRepository _developerRepository;
         private readonly IAgentRepository _agentRepository;
@@ -22,18 +24,23 @@ namespace REAL_STATE.Areas.Admin.Controllers
             IPropertyRepository propertyRepository,
             IDeveloperRepository developerRepository,
             IAgentRepository agentRepository,
-            IPropertyService propertyService)
+            IPropertyService propertyService,
+            SafeErrorMessages errors)
         {
+            _errors = errors;
             _propertyRepository = propertyRepository;
             _developerRepository = developerRepository;
             _agentRepository = agentRepository;
             _propertyService = propertyService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 20, string? q = null)
         {
-            var properties = await _propertyRepository.GetAllAsync(includeProperties: "Developer,Agent");
-            return View(properties);
+            q = q?.Trim();
+            var result = await _propertyRepository.GetPageAsync(
+                query => query.OrderBy(x => x.Title).ThenBy(x => x.Id), page, pageSize,
+                x => q == null || q == "" || x.Title.Contains(q) || x.City.Contains(q) || x.PropertyType.Contains(q), includeProperties: "Developer,Agent");
+            return View(result);
         }
 
         [HttpGet]
@@ -47,7 +54,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
                 if (property == null)
                     return NotFound();
 
-                vm.Property = property;
+                vm.Property = PropertyInput.FromEntity(property);
                 vm.IsEdit = true;
             }
 
@@ -87,7 +94,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                TempData["ErrorMessage"] = _errors.For(ex);
             }
 
             return RedirectToAction(nameof(Index));
@@ -103,20 +110,20 @@ namespace REAL_STATE.Areas.Admin.Controllers
 
             try
             {
-                 _propertyRepository.Remove(property);  
+                 _propertyRepository.Remove(property);
                 await _propertyRepository.Save();
                 return Json(new { success = true, message = "Property deleted successfully." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = _errors.For(ex) });
             }
         }
 
         private async Task LoadListsAsync(PropertyVM vm)
         {
-            var developers = await _developerRepository.GetAllAsync();
-            var agents = await _agentRepository.GetAllAsync();
+            var developers = await _developerRepository.GetAllAsync(x => x.IsActive);
+            var agents = await _agentRepository.GetAllAsync(x => x.IsActive);
 
             vm.Developers = developers.Select(x => new SelectListItem
             {

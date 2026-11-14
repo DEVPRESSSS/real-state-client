@@ -13,6 +13,8 @@ namespace REAL_STATE.Data
         {
         }
 
+        protected ApplicationDbContext(DbContextOptions options) : base(options) { }
+
         public DbSet<Developers> Developers => Set<Developers>();
         public DbSet<Agent> Agents => Set<Agent>();
         public DbSet<Property> Properties => Set<Property>();

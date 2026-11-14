@@ -11,24 +11,31 @@ using REAL_STATE.Utilities;
 namespace REAL_STATE.Areas.Admin.Controllers
 {
     [Area(RoleSD.Admin)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [Authorize(Roles = RoleSD.Admin)]
     public class DeveloperController : Controller
     {
+        private readonly REAL_STATE.Utilities.SafeErrorMessages _errors;
         private readonly IDeveloperRepository _developerRepository;
         private readonly IDeveloperService _developerService;
 
         public DeveloperController(
             IDeveloperRepository developerRepository,
-            IDeveloperService developerService)
+            IDeveloperService developerService,
+            SafeErrorMessages errors)
         {
+            _errors = errors;
             _developerRepository = developerRepository;
             _developerService = developerService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 20, string? q = null)
         {
-            var developers = await _developerRepository.GetAllAsync();
-            return View(developers);
+            q = q?.Trim();
+            var result = await _developerRepository.GetPageAsync(
+                query => query.OrderBy(x => x.Name).ThenBy(x => x.Id), page, pageSize,
+                x => q == null || q == "" || x.Name.Contains(q) || x.Slug.Contains(q), includeProperties: "");
+            return View(result);
         }
 
         [HttpGet]
@@ -74,7 +81,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                TempData["ErrorMessage"] = _errors.For(ex);
             }
 
             return RedirectToAction(nameof(Index));
@@ -96,7 +103,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = _errors.For(ex) });
             }
         }
 

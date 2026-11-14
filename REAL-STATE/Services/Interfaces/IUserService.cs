@@ -6,7 +6,7 @@ namespace REAL_STATE.Services.Interfaces
     public interface IUserService
     {
 
-        Task<List<UserRowVM>> GetAllUsers(string currentUserId);
+        Task<PagedResult<UserRowVM>> GetAllUsers(string currentUserId, int page = 1, int pageSize = 20, string? search = null);
         Task<UserVM?> GetUserForEdit(string id);
         Task AddUser(UserVM vm);
         Task UpdateUser(UserVM vm);

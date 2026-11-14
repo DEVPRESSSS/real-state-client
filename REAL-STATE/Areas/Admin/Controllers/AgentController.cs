@@ -10,24 +10,31 @@ using REAL_STATE.Models;
 namespace REAL_STATE.Areas.Admin.Controllers
 {
     [Area(RoleSD.Admin)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [Authorize(Roles = RoleSD.Admin)]
     public class AgentController : Controller
     {
+        private readonly REAL_STATE.Utilities.SafeErrorMessages _errors;
         private readonly IAgentRepository _agentRepository;
         private readonly IAgentService _agentService;
 
         public AgentController(
             IAgentRepository agentRepository,
-            IAgentService agentService)
+            IAgentService agentService,
+            SafeErrorMessages errors)
         {
+            _errors = errors;
             _agentRepository = agentRepository;
             _agentService = agentService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 20, string? q = null)
         {
-            var properties = await _agentRepository.GetAllAsync();
-            return View(properties);
+            q = q?.Trim();
+            var result = await _agentRepository.GetPageAsync(
+                query => query.OrderBy(x => x.FullName).ThenBy(x => x.Id), page, pageSize,
+                x => q == null || q == "" || x.FullName.Contains(q) || x.Email.Contains(q), includeProperties: "");
+            return View(result);
         }
 
         [HttpGet]
@@ -46,7 +53,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             return View(new Agent());
         }
 
-   
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -75,7 +82,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                TempData["ErrorMessage"] = _errors.For(ex);
             }
 
             return RedirectToAction(nameof(Index));
@@ -91,13 +98,13 @@ namespace REAL_STATE.Areas.Admin.Controllers
 
             try
             {
-                 _agentRepository.Remove(agent);  
+                 _agentRepository.Remove(agent);
                 await _agentRepository.Save();
                 return Json(new { success = true, message = "Agent deleted successfully." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = _errors.For(ex) });
             }
         }
 

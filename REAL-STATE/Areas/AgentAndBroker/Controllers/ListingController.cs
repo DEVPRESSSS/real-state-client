@@ -11,9 +11,11 @@ using REAL_STATE.Utilities;
 namespace REAL_STATE.Areas.AgentAndBroker.Controllers
 {
     [Area("AgentAndBroker")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [Authorize(Roles = RoleSD.Agent)]
     public class ListingController : Controller
     {
+        private readonly REAL_STATE.Utilities.SafeErrorMessages _errors;
         private readonly IPropertyRepository _propertyRepository;
         private readonly IDeveloperRepository _developerRepository;
         private readonly IAgentRepository _agentRepository;
@@ -23,8 +25,10 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
             IPropertyRepository propertyRepository,
             IDeveloperRepository developerRepository,
             IAgentRepository agentRepository,
-            IPropertyService propertyService)
+            IPropertyService propertyService,
+            SafeErrorMessages errors)
         {
+            _errors = errors;
             _propertyRepository = propertyRepository;
             _developerRepository = developerRepository;
             _agentRepository = agentRepository;
@@ -35,13 +39,14 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
         private Task<Agent?> GetCurrentAgentAsync() =>
             _agentRepository.GetAsync(x => x.UserId == CurrentUserId);
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 20, string? q = null)
         {
             var agent = await GetCurrentAgentAsync();
             if (agent == null) return Forbid();
 
-            var properties = await _propertyRepository.GetAllAsync(
-                x => x.AgentId == agent.Id,
+            var properties = await _propertyRepository.GetPageAsync(
+                query => query.OrderByDescending(x => x.CreatedAt).ThenBy(x => x.Id), page, pageSize,
+                x => x.AgentId == agent.Id && (q == null || q == "" || x.Title.Contains(q) || x.City.Contains(q)),
                 includeProperties: "Developer");
 
             ViewBag.IsAgentActive = agent.IsActive;
@@ -60,9 +65,9 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
             {
                 var property = await _propertyRepository.GetAsync(x => x.Id == id && x.AgentId == agent.Id);
                 if (property == null)
-                    return NotFound();   
+                    return NotFound();
 
-                vm.Property = property;
+                vm.Property = PropertyInput.FromEntity(property);
                 vm.IsEdit = true;
             }
 
@@ -71,6 +76,7 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "ActiveAgent")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upsert(PropertyVM vm)
         {
@@ -86,11 +92,11 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
             var existing = await _propertyRepository.GetAsync(x => x.Id == vm.Property.Id);
 
             if (existing != null && existing.AgentId != agent.Id)
-                return Forbid();   
+                return Forbid();
 
             vm.IsEdit = existing != null;
             vm.Property.AgentId = agent.Id;
-            vm.Property.IsFeatured = existing?.IsFeatured ?? false;   
+            vm.Property.IsFeatured = existing?.IsFeatured ?? false;
             ModelState.Remove("Property.AgentId");
             ModelState.Remove("Property.IsFeatured");
 
@@ -115,7 +121,7 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                ModelState.AddModelError(string.Empty, _errors.For(ex));
                 await LoadDevelopersAsync(vm);
                 return View(vm);
             }
@@ -123,6 +129,7 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
             return RedirectToAction(nameof(Index));
         }
         [HttpPost]
+        [Authorize(Policy = "ActiveAgent")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
@@ -136,13 +143,13 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
 
             try
             {
-                _propertyRepository.Remove(property);  
+                _propertyRepository.Remove(property);
                 await _propertyRepository.Save();
                 return Json(new { success = true, message = "Listing deleted successfully." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return BadRequest(new { success = false, message = _errors.For(ex) });
             }
         }
 

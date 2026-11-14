@@ -19,9 +19,7 @@
         data: data,
         index: 'id',
         layout: 'fitDataStretch',
-        pagination: true,
-        paginationSize: 10,
-        paginationSizeSelector: [10, 25, 50],
+        pagination: false,
         placeholder: 'No matching properties found.',
         columns: [
             {
@@ -85,7 +83,7 @@
     }
 
     if (search) {
-        search.addEventListener('input', function () {
+        search.addEventListener('input', tableUtils.debounce(function () {
             var term = search.value.trim().toLowerCase();
             if (!term) { table.clearFilter(); return; }
             table.setFilter(function (row) {
@@ -93,12 +91,12 @@
                     return String(row[f] || '').toLowerCase().indexOf(term) !== -1;
                 });
             });
-        });
+        }, 200));
     }
 
     // Icons drawn by Tabulator need Lucide re-run after each render
     table.on('renderComplete', function () {
-        if (window.lucide) lucide.createIcons();
+        if (window.lucide) tableUtils.icons(el);
     });
     table.on('tableBuilt', updateCount);
     table.on('dataFiltered', updateCount);

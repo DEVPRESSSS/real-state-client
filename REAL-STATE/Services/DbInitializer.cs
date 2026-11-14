@@ -19,34 +19,35 @@ namespace REAL_STATE.Services
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            if (_context.Database.GetPendingMigrations().Any())
+            if ((await _context.Database.GetPendingMigrationsAsync()).Any())
             {
-                _context.Database.Migrate();
+                await _context.Database.MigrateAsync();
             }
 
-            if (!_roleManager.RoleExistsAsync(RoleSD.User).GetAwaiter().GetResult() || !_roleManager.RoleExistsAsync(RoleSD.Agent).GetAwaiter().GetResult())
-            {
-                // Create Roles
-                _roleManager.CreateAsync(new IdentityRole(RoleSD.User)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(RoleSD.Admin)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(RoleSD.Agent)).GetAwaiter().GetResult();
+            var seedAdmin = !await _roleManager.RoleExistsAsync(RoleSD.User)
+                || !await _roleManager.RoleExistsAsync(RoleSD.Agent);
+            foreach (var role in new[] { RoleSD.User, RoleSD.Admin, RoleSD.Agent })
+                if (!await _roleManager.RoleExistsAsync(role))
+                    (await _roleManager.CreateAsync(new IdentityRole(role))).ThrowIfFailed();
 
-                var user = new ApplicationUser
+            if (seedAdmin)
+            {
+                var user = await _userManager.FindByEmailAsync("clive@gmail.com");
+                if (user == null)
                 {
-                    UserName = "clive@gmail.com",
-                    Email = "clive@gmail.com",
-                   
-                    PhoneNumber = "09789446980",
-                    EmailConfirmed = true
-                };
-
-                _userManager.CreateAsync(user, "Admin123*").GetAwaiter().GetResult();
-                _userManager.AddToRoleAsync(user, RoleSD.Admin).GetAwaiter().GetResult();
+                    user = new ApplicationUser
+                    {
+                        UserName = "clive@gmail.com", Email = "clive@gmail.com",
+                        PhoneNumber = "09789446980", EmailConfirmed = true
+                    };
+                    // P0 bootstrap credentials are preserved at the user's explicit request.
+                    (await _userManager.CreateAsync(user, "Admin123*")).ThrowIfFailed();
+                }
+                if (!await _userManager.IsInRoleAsync(user, RoleSD.Admin))
+                    (await _userManager.AddToRoleAsync(user, RoleSD.Admin)).ThrowIfFailed();
             }
-
         }
     }
-
 }

@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="REAL-STATE/REAL-STATE.csproj" />
+  <Project Path="REAL-STATE.Tests/REAL-STATE.Tests.csproj" />
 </Solution>

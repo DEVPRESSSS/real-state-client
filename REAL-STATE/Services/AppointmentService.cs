@@ -16,7 +16,7 @@ namespace REAL_STATE.Services
         private readonly IPropertyRepository _propertyRepository;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppointmentService(IAppointmentRepository appointmentRepository, 
+        public AppointmentService(IAppointmentRepository appointmentRepository,
             UserManager<ApplicationUser> userManager,
             IPropertyRepository propertyRepository)
         {
@@ -121,7 +121,7 @@ namespace REAL_STATE.Services
         private async Task<Property?> LoadPropertyAsync(string propertyId) =>
 
                         await _propertyRepository.GetAsync(x => x.Id == propertyId, includeProperties: "Images,Agent");
-      
+
 
         private static void FillPropertySummary(ScheduleAppointmentVM vm, Property p)
         {
@@ -152,28 +152,16 @@ namespace REAL_STATE.Services
         }
 
 
-        public async Task<(bool Success, string Message)> ApprovedOrRejectAppoinment(string appointmentId)
+        public async Task<(bool Success, string Message)> ApproveAsync(string appointmentId, ClaimsPrincipal user)
         {
-            var appointment = await _appointmentRepository.GetAsync(
-                 a => a.Id == appointmentId
-             );
-
-            if (appointment == null)
-            {
-                return (false, "Viewing appointment was not found.");
-            }
-
-            if (appointment.Status != "Pending")
-            {
-                return (false, "This appointment has already been processed.");
-            }
-
-            appointment.Status = "Approved";
-            await _appointmentRepository.UpdateAsync(appointment);
-            await _appointmentRepository.Save();
-
-            return (true,
-                $"Viewing request has been approved for {appointment.ContactName}.");
+            var userId = _userManager.GetUserId(user);
+            if (user.Identity?.IsAuthenticated != true || string.IsNullOrWhiteSpace(userId)
+                || (!user.IsInRole(REAL_STATE.Utilities.RoleSD.Admin) && !user.IsInRole(REAL_STATE.Utilities.RoleSD.Agent)))
+                return (false, "Access denied.");
+            var changed = await _appointmentRepository.ApproveAsync(appointmentId, userId,
+                user.IsInRole(REAL_STATE.Utilities.RoleSD.Admin));
+            return changed ? (true, "Viewing request approved.")
+                : (false, "The appointment is unavailable or has already been processed.");
         }
 
         public async Task<PagedResult<AppointmentListVM>> GetAppointmentsForAgentAsync(int page, int pageSize, string userId)
@@ -181,7 +169,7 @@ namespace REAL_STATE.Services
             page = Math.Max(1, page);
             pageSize = Math.Clamp(pageSize, 10, 100);
 
-            return await _appointmentRepository.GetPagedAppointentForAgentAsync(
+            return await _appointmentRepository.GetPagedForAgentAsync(
                 page,
                 pageSize,
                 userId

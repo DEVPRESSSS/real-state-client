@@ -1,7 +1,12 @@
 {
   "dependencies": {
-    "@tailwindcss/cli": "^4.3.3",
-    "tabulator-tables": "^6.7.1",
-    "tailwindcss": "^4.3.3"
+    "@tailwindcss/cli": "4.3.3",
+    "lucide": "0.469.0",
+    "sweetalert2": "11.26.25",
+    "tabulator-tables": "6.7.1",
+    "tailwindcss": "4.3.3"
+  },
+  "scripts": {
+    "test:frontend": "node --test REAL-STATE.Tests/frontend.test.cjs"
   }
 }

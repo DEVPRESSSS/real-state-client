@@ -8,6 +8,7 @@ using System.Security.Claims;
 namespace REAL_STATE.Areas.Admin.Controllers
 {
     [Area(RoleSD.Admin)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [Authorize(Roles = $"{RoleSD.Admin},{RoleSD.Agent}")]
     public class AppointmentController : Controller
     {
@@ -46,7 +47,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             }
 
             var result = await _appointmentService
-                .ApprovedOrRejectAppoinment(appointmentId);
+                .ApproveAsync(appointmentId, User);
 
             if (!result.Success)
             {

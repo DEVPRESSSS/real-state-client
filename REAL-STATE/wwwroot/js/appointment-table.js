@@ -215,7 +215,7 @@
         modal.classList.remove('hidden');
         modal.classList.add('flex');
 
-        if (window.lucide) lucide.createIcons();
+        if (window.lucide) tableUtils.icons(el);
     }
 
     function closeAppointmentModal() {
@@ -303,7 +303,7 @@
             approveBtn.innerHTML =
                 '<i data-lucide="check-circle" class="size-4"></i>Approve Request';
 
-            if (window.lucide) lucide.createIcons();
+            tableUtils.icons(approveBtn);
         }
     });
     var fields = [
@@ -331,7 +331,7 @@
     }
 
     if (search) {
-        search.addEventListener('input', function () {
+        search.addEventListener('input', tableUtils.debounce(function () {
             var term = search.value.trim().toLowerCase();
 
             if (!term) {
@@ -346,7 +346,7 @@
                         .indexOf(term) !== -1;
                 });
             });
-        });
+        }, 200));
     }
 
     // View appointment event.
@@ -364,7 +364,7 @@
     });
 
     table.on('renderComplete', function () {
-        if (window.lucide) lucide.createIcons();
+        if (window.lucide) tableUtils.icons(el);
     });
 
     table.on('tableBuilt', updateCount);

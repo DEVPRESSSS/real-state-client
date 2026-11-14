@@ -42,12 +42,12 @@
     <title>@ViewData["Title"] - SHR</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/REAL_STATE.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/REAL-STATE.styles.css" asp-append-version="true" />
     <link rel="icon" href="~/Logo.ico"/>
     <!--Google Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
     <!--Tailwind Icons-->
 </head>
 <body class="bg-snow text-gray-900 antialiased">
@@ -150,7 +150,7 @@
 
                 <!-- Mobile toggle -->
                 <button type="button"
-                        class="inline-flex items-center justify-center rounded-md border border-gray-300 text-navy p-2  
+                        class="inline-flex items-center justify-center rounded-md border border-gray-300 text-navy p-2
                     transition-colors hover:bg-azure/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 lg:hidden"
                         data-toggle="#mobileMenu"
                         aria-controls="mobileMenu"
@@ -286,9 +286,9 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/table-utils.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js" asp-append-version="true"></script>
 
     <!-- Navbar: mobile menu + user dropdown -->
 
@@ -306,9 +306,9 @@
         </script>
     }
 
+    <script src="~/lib/lucide/lucide.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         lucide.createIcons();
     </script>

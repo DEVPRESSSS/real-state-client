@@ -5,7 +5,8 @@ using REAL_STATE.Utilities;
 namespace REAL_STATE.Areas.AgentAndBroker.Controllers
 {
     [Area("AgentAndBroker")]
-    [Authorize(Roles = RoleSD.Agent)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    [Authorize(Policy = "ActiveAgent")]
     public class DashboardController : Controller
     {
         public IActionResult Index()
