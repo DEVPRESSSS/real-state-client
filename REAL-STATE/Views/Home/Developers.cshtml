@@ -1,6 +1,5 @@
 ﻿@using REAL_STATE.Models.VM
 @model REAL_STATE.Models.VM.PagedResult<DeveloperCardVM>
-<partial name="_Pagination" model="Model" />
 @{
     ViewData["Title"] = "Developers";
 }
@@ -14,7 +13,7 @@
     </div>
 </section>
 
-<section >
+<section class="pb-12">
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 
         @if (Model != null && Model.Items.Any())
@@ -83,5 +82,6 @@
                 <p>No developers available yet.</p>
             </div>
         }
+        <partial name="_Pagination" model="Model" />
     </div>
 </section>

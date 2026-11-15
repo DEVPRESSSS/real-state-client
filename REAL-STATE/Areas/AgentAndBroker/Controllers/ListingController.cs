@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Options;
+using REAL_STATE.Services;
 using REAL_STATE.Models;
 using REAL_STATE.Models.VM;
 using REAL_STATE.Repositories.IRepositories;
@@ -137,20 +139,35 @@ namespace REAL_STATE.Areas.AgentAndBroker.Controllers
             if (agent == null)
                 return StatusCode(403, new { success = false, message = "No agent profile is linked to your account." });
 
-            var property = await _propertyRepository.GetAsync(x => x.Id == id && x.AgentId == agent.Id);
-            if (property == null)
-                return NotFound(new { success = false, message = "Listing not found." });
-
             try
             {
-                _propertyRepository.Remove(property);
-                await _propertyRepository.Save();
-                return Json(new { success = true, message = "Listing deleted successfully." });
+                if (!await _propertyService.ArchiveAsync(id, agent.Id))
+                    return NotFound(new { success = false, message = "Listing not found." });
+                return Json(new { success = true, message = "Listing archived successfully." });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { success = false, message = _errors.For(ex) });
             }
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "ActiveAgent")]
+        public async Task<IActionResult> Share(string id, [FromServices] PropertyReferralLinks referrals,
+            [FromServices] IOptions<PublicSiteOptions> site)
+        {
+            var agent = await GetCurrentAgentAsync();
+            if (agent is not { IsActive: true }) return Forbid();
+
+            var listing = await _propertyRepository.GetAsync(p =>
+                p.Id == id && p.AgentId == agent.Id && p.Status == "Available");
+            if (listing == null) return NotFound();
+
+            var token = referrals.Create(listing.Id, agent.Id);
+            var route = Url.Action("Details", "Home", new { area = "", id = listing.Id, referral = token });
+            if (route == null) return NotFound();
+            var origin = new Uri(site.Value.BaseUrl).GetLeftPart(UriPartial.Authority);
+            return View(new PropertyShareVM(listing.Title, origin + route));
         }
 
         private async Task LoadDevelopersAsync(PropertyVM vm)

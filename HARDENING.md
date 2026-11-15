@@ -59,3 +59,9 @@ dotnet list REAL-STATE/REAL-STATE.csproj package --vulnerable --include-transiti
 The backend suite uses isolated in-memory SQLite databases for relational transactions, scoped pagination, conditional approvals, account rollback, and security-stamp changes. ASP.NET test-host requests cover crafted listing payloads, inactive agents, cross-agent approvals, anti-forgery enforcement, public confirmation pages, nonce rendering, and throttling. No tests connect to the application's SQL Server database or send email.
 
 Before production rollout, smoke-test real SMTP delivery, confirmation/resend and password reset, administrative account changes, HTTPS/proxy behavior, and the SQL Server migration command in staging. SQLite tests do not replace SQL Server query-plan or concurrency/load testing. Measure query counts, response sizes, allocations and p95 latency using representative listing and user volumes before changing the existing indexes or adding caching.
+
+## Viewing appointments and property referrals
+
+Apply the database migration before deploying this version. Existing appointments retain their stored wall-clock times and are displayed as Philippine time. Archived properties stay visible in management screens and can be restored by editing their status. Historical requests remain available to staff.
+
+Active agents and brokers can share their own available properties from My listings. A viewing request made through a valid link is marked as a property referral. Links use ASP.NET Core Data Protection. Persist the key ring across deployments and share it across application instances so previously issued links continue to work. A link stops attributing requests if its property is reassigned or its issuing agent is deactivated.

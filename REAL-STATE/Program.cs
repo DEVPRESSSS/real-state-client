@@ -40,7 +40,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 builder.Services.AddAuthorization(options => options.AddPolicy("ActiveAgent", policy =>
-    policy.RequireAuthenticatedUser().AddRequirements(new ActiveAgentRequirement())));
+   policy.RequireAuthenticatedUser().AddRequirements(new ActiveAgentRequirement())));
 builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, ActiveAgentHandler>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAccountConfirmationService, AccountConfirmationService>();
@@ -81,6 +81,7 @@ builder.Services.AddScoped<IDeveloperService, DeveloperService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddSingleton<PropertyReferralLinks>();
 builder.Services.AddScoped<IRefferalService, ReferralService>();
 
 #endregion

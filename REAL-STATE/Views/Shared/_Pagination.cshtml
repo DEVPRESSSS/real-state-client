@@ -3,14 +3,34 @@
 @{
     string PageUrl(int page)
     {
-        var query = Context.Request.Query.ToDictionary(q => q.Key, q => (string?)q.Value.ToString(), StringComparer.OrdinalIgnoreCase);
+        var query = Context.Request.Query.ToDictionary(q => q.Key, q => q.Value, StringComparer.OrdinalIgnoreCase);
         query["page"] = page.ToString();
         query["pageSize"] = Model.PageSize.ToString();
-        return QueryHelpers.AddQueryString(Context.Request.PathBase + Context.Request.Path, query);
+        return QueryHelpers.AddQueryString((Context.Request.PathBase + Context.Request.Path).ToString(), query);
     }
+
+    const string button = "inline-flex items-center justify-center rounded border px-3 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2";
 }
-<nav aria-label="Pagination" class="my-4 flex items-center justify-between gap-4">
-    <span>@Model.TotalItems results � Page @Model.CurrentPage of @Math.Max(1, Model.TotalPages)</span>
-    @if (Model.HasPreviousPage) { <a href="@PageUrl(Model.CurrentPage - 1)" rel="prev">Previous</a> }
-    @if (Model.HasNextPage) { <a href="@PageUrl(Model.CurrentPage + 1)" rel="next">Next</a> }
-</nav>
+@if (Model.TotalItems > 0)
+{
+    <nav aria-label="Pagination" class="my-4 flex flex-wrap items-center justify-between gap-3 border-t border-ice pt-4">
+        <p class="text-sm text-navy/60">
+            @Model.TotalItems @(Model.TotalItems == 1 ? "result" : "results")
+            <span aria-hidden="true">&middot;</span>
+            Page @Model.CurrentPage of @Model.TotalPages
+        </p>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="flex items-center gap-2">
+                @if (Model.HasPreviousPage)
+                {
+                    <a href="@PageUrl(Model.CurrentPage - 1)" rel="prev" class="@button border-ice bg-white text-navy hover:bg-ice">Previous</a>
+                }
+                @if (Model.HasNextPage)
+                {
+                    <a href="@PageUrl(Model.CurrentPage + 1)" rel="next" class="@button border-azure bg-azure text-white hover:bg-azure-dark">Next</a>
+                }
+            </div>
+        }
+    </nav>
+}

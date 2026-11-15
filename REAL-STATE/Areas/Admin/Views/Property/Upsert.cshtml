@@ -159,7 +159,14 @@
 
                 <div class="mb-4">
                     <label asp-for="Property.Status" class="@labelCls">Status <span class="text-red-700">*</span></label>
-                    <input asp-for="Property.Status" class="@inputCls" maxlength="30" />
+                    <select asp-for="Property.Status" class="@inputCls">
+                        <option value="Available">Available</option>
+                        <option value="Reserved">Reserved</option>
+                        <option value="Sold">Sold</option>
+                        <option value="Rented">Rented</option>
+                        <option value="Unavailable">Unavailable</option>
+                        <option value="Archived">Archived</option>
+                    </select>
                     <span asp-validation-for="Property.Status" class="@errCls"></span>
                 </div>
 

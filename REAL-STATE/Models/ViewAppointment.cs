@@ -7,6 +7,7 @@
         public string PropertyId { get; set; } = string.Empty;
         public string? UserId { get; set; }
         public string? AgentId { get; set; }
+        public string? ReferralAgentId { get; set; }
         public string ContactName { get; set; } = string.Empty;
         public string ContactEmail { get; set; } = string.Empty;
         public string? ContactPhone { get; set; }

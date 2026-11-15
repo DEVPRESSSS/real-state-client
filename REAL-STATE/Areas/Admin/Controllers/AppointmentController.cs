@@ -17,11 +17,11 @@ namespace REAL_STATE.Areas.Admin.Controllers
         {
            _appointmentService = appointmentService;
         }
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10, string? q = null)
         {
             if (User.IsInRole(RoleSD.Admin))
             {
-                var all = await _appointmentService.GetAppointmentsAsync(page, pageSize);
+                var all = await _appointmentService.GetAppointmentsAsync(page, pageSize, q);
                 return View(all);
             }
 
@@ -29,7 +29,7 @@ namespace REAL_STATE.Areas.Admin.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Forbid();
 
-            var mine = await _appointmentService.GetAppointmentsForAgentAsync( page, pageSize, userId);
+            var mine = await _appointmentService.GetAppointmentsForAgentAsync(page, pageSize, userId, q);
             return View(mine);
         }
 

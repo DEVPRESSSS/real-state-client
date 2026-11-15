@@ -2,7 +2,7 @@
 @model ScheduleAppointmentVM
 @{
     ViewData["Title"] = "Request a viewing";
-    var minDate = DateTime.Today.ToString("yyyy-MM-dd");
+    var minDate = REAL_STATE.Utilities.ViewingTime.Now.ToString("yyyy-MM-dd");
     var isRent = string.Equals(Model.ListingType, "Rent", StringComparison.OrdinalIgnoreCase);
 
     const string inputCls = "block w-full rounded border border-ice bg-white px-3 py-2.5 text-navy placeholder:text-navy/40 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/30";
@@ -17,7 +17,7 @@
     <nav aria-label="Breadcrumb" class="mb-6 text-sm">
         <ol class="flex flex-wrap items-center gap-2 text-navy/60">
             <li>
-                <a class="@link" asp-area="" asp-controller="Home" asp-action="Property"
+                <a class="@link" asp-area="" asp-controller="Home" asp-action="Index"
                    asp-route-listingType="@Model.ListingType">Properties</a>
             </li>
             <li aria-hidden="true">/</li>
@@ -67,6 +67,7 @@
                   class="rounded-lg border border-ice bg-white p-6 shadow-sm md:p-8">
 
                 <input type="hidden" asp-for="PropertyId" />
+                <input type="hidden" asp-for="ReferralToken" />
 
                 <div asp-validation-summary="ModelOnly" class="mb-4 text-sm text-red-700" role="alert"></div>
 
@@ -116,7 +117,7 @@
                             class="inline-flex items-center justify-center bg-azure px-6 py-3 font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
                         Send viewing request
                     </button>
-                    <a asp-area="" asp-controller="Home" asp-action="Property"
+                    <a asp-area="" asp-controller="Home" asp-action="Index"
                        asp-route-listingType="@Model.ListingType"
                        class="inline-flex items-center justify-center border border-azure px-6 py-3 font-medium text-azure transition-colors hover:bg-azure hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
                         Cancel

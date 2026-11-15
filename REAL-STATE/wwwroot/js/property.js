@@ -7,13 +7,13 @@
     const deleteUrl = '/Admin/Property/Delete';
 
     Swal.fire({
-        title: 'Delete property?',
-        text: `"${title}" will be permanently deleted.`,
+        title: 'Archive property?',
+        text: `"${title}" will be removed from public search. Existing viewing requests and history are retained.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#b91c1c',
         cancelButtonColor: '#1B1B2F',
-        confirmButtonText: 'Yes, delete it',
+        confirmButtonText: 'Archive',
         reverseButtons: true,
         showLoaderOnConfirm: true,
         allowOutsideClick: () => !Swal.isLoading(),
@@ -32,7 +32,7 @@
 
                 const data = await res.json();
                 if (!res.ok || !data.success) {
-                    throw new Error(data.message || 'Delete failed.');
+                    throw new Error(data.message || 'Archive failed.');
                 }
                 return data;
             } catch (err) {
@@ -46,7 +46,7 @@
 
         Swal.fire({
             icon: 'success',
-            title: 'Deleted',
+            title: 'Archived',
             text: result.value.message,
             timer: 1500,
             showConfirmButton: false

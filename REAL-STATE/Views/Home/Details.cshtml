@@ -8,6 +8,7 @@
     var location = string.Join(", ", new[] { p.Address, p.City, p.Province, p.Country }
         .Where(x => !string.IsNullOrWhiteSpace(x)));
 
+    var referral = Context.Request.Query["referral"].ToString();
     var isAvailable = string.Equals(p.Status, "Available", StringComparison.OrdinalIgnoreCase);
     var isRent = p.ListingType == "Rent";
 
@@ -25,7 +26,7 @@
     <nav aria-label="Breadcrumb" class="mb-6 text-sm">
         <ol class="flex flex-wrap items-center gap-2 text-navy/60">
             <li>
-                <a class="@link" asp-controller="Home" asp-action="Property" asp-route-listingType="@p.ListingType">
+                <a class="@link" asp-controller="Home" asp-action="Index" asp-route-listingType="@p.ListingType">
                     Properties for @(isRent ? "rent" : "sale")
                 </a>
             </li>
@@ -143,7 +144,7 @@
                         <p class="mb-4 text-sm text-navy/60">Send a viewing request with your preferred date and time.</p>
                         <a class="@btnPrimary"
                            asp-area="Client" asp-controller="Appointment" asp-action="Create"
-                           asp-route-propertyId="@p.Id">
+                           asp-route-propertyId="@p.Id" asp-route-referral="@(referral.Length is > 0 and <= 512 ? referral : null)">
                             <i data-lucide="calendar-check" class="size-4" aria-hidden="true"></i>Schedule a viewing
                         </a>
                     }
@@ -257,7 +258,7 @@
     </div>
 
     <div class="mt-8">
-        <a asp-controller="Home" asp-action="Property" asp-route-listingType="@p.ListingType"
+        <a asp-controller="Home" asp-action="Index" asp-route-listingType="@p.ListingType"
            class="inline-flex items-center gap-2 border border-ice bg-white px-4 py-2 font-medium text-navy transition-colors hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
             <i data-lucide="arrow-left" class="size-4" aria-hidden="true"></i>Back to listings
         </a>

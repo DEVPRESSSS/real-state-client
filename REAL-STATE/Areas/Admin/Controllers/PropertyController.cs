@@ -104,15 +104,11 @@ namespace REAL_STATE.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
-            var property = await _propertyRepository.GetAsync(x => x.Id == id);
-            if (property == null)
-                return NotFound(new { success = false, message = "Property not found." });
-
             try
             {
-                 _propertyRepository.Remove(property);
-                await _propertyRepository.Save();
-                return Json(new { success = true, message = "Property deleted successfully." });
+                if (!await _propertyService.ArchiveAsync(id))
+                    return NotFound(new { success = false, message = "Property not found." });
+                return Json(new { success = true, message = "Property archived successfully." });
             }
             catch (Exception ex)
             {

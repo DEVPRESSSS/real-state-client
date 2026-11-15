@@ -22,7 +22,6 @@
 
 @Html.AntiForgeryToken()
 <partial name="_TableSearch" />
-<partial name="_Pagination" model="Model" />
 
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
@@ -66,6 +65,8 @@ else
         </a>
     </div>
 }
+
+<partial name="_Pagination" model="Model" />
 
 @section Scripts {
     <script src="~/lib/tabulator/tabulator.min.js"></script>

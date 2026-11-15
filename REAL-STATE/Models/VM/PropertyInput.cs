@@ -22,7 +22,7 @@ public sealed class PropertyInput
     [Required, StringLength(100)] public string City { get; set; } = "";
     [StringLength(100)] public string? Province { get; set; }
     [Required, StringLength(100)] public string Country { get; set; } = "Philippines";
-    [Required, RegularExpression("Available|Sold|Rented|Reserved|Unavailable")]
+    [Required, RegularExpression("Available|Sold|Rented|Reserved|Unavailable|Archived")]
     public string Status { get; set; } = "Available";
     public bool IsFeatured { get; set; }
 

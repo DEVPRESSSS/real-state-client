@@ -103,8 +103,6 @@ public class RegisterModel : PageModel
                 _logger.LogInformation("User created a new account with password.");
 
                 (await _userManager.AddToRoleAsync(user, RoleSD.User)).ThrowIfFailed();
-                await transaction.CommitAsync();
-
                 if (!string.IsNullOrWhiteSpace(ReferralCode))
                 {
                     try
@@ -115,9 +113,13 @@ public class RegisterModel : PageModel
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to redeem referral code for user {UserId}.", user.Id);
+                        _logger.LogError(ex, "Failed to redeem referral code during registration.");
+                        ModelState.AddModelError(string.Empty, "We could not save your referral. Please try again.");
+                        return Page();
                     }
                 }
+
+                await transaction.CommitAsync();
 
                 try { await _confirmation.SendAsync(user); }
                 catch (GlobalExceptionHandler exception)

@@ -16,6 +16,8 @@
         city = p.City,
         developer = p.Developer?.Name ?? "",
         status = p.Status,
+        shareUrl = isActive && p.Status == "Available"
+            ? Url.Action("Share", "Listing", new { area = "AgentAndBroker", id = p.Id }) : null,
         editUrl = Url.Action("Upsert", "Listing", new { area = "AgentAndBroker", id = p.Id })
     }).ToList();
 }
@@ -27,7 +29,6 @@
 
 @Html.AntiForgeryToken()
 <partial name="_TableSearch" />
-<partial name="_Pagination" model="Model" />
 
 @if (!isActive)
 {
@@ -85,6 +86,8 @@ else
         }
     </div>
 }
+
+<partial name="_Pagination" model="Model" />
 
 @section Scripts {
     <script src="~/lib/tabulator/tabulator.min.js"></script>

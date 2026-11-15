@@ -8,13 +8,13 @@ namespace REAL_STATE.Repositories.IRepositories
         Task<bool> ApproveAsync(string appointmentId, string userId, bool isAdmin);
         Task<PagedResult<AppointmentListVM>> GetPagedAsync(
             int page,
-            int pageSize
+            int pageSize, string? q = null
         );
 
         Task<PagedResult<AppointmentListVM>> GetPagedForAgentAsync(
              int page,
              int pageSize,
-             string userId
+             string userId, string? q = null
          );
 
     }

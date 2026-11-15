@@ -19,13 +19,14 @@ namespace REAL_STATE.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create(string? propertyId)
+        public async Task<IActionResult> Create(string? propertyId, string? referral)
         {
             if (string.IsNullOrWhiteSpace(propertyId)) return NotFound();
 
             var vm = await _appointments.GetFormAsync(propertyId, User);
             if (vm == null) return NotFound();
 
+            vm.ReferralToken = referral is { Length: <= 512 } ? referral : null;
             return View(vm);
         }
 
@@ -56,7 +57,7 @@ namespace REAL_STATE.Controllers
         public IActionResult Confirmation()
         {
             if (TempData["Viewing.Property"] is not string title)
-                return RedirectToAction("Index", "Properties");
+                return RedirectToAction("Index", "Home", new { area = "" });
 
             ViewData["Property"] = title;
             ViewData["When"] = TempData["Viewing.When"];

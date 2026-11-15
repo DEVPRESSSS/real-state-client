@@ -7,13 +7,13 @@
     const deleteUrl = '/AgentAndBroker/Listing/Delete';
 
     Swal.fire({
-        title: 'Delete listing?',
-        text: `"${title}" will be permanently deleted.`,
+        title: 'Archive listing?',
+        text: `"${title}" will be removed from public search. Existing viewing requests and history are retained.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#b91c1c',
         cancelButtonColor: '#1B1B2F',
-        confirmButtonText: 'Yes, delete it',
+        confirmButtonText: 'Archive',
         reverseButtons: true,
         showLoaderOnConfirm: true,
         allowOutsideClick: () => !Swal.isLoading(),
@@ -29,7 +29,7 @@
                     body: new URLSearchParams({ id })
                 });
                 const data = await res.json();
-                if (!res.ok || !data.success) throw new Error(data.message || 'Delete failed.');
+                if (!res.ok || !data.success) throw new Error(data.message || 'Archive failed.');
                 return data;
             } catch (err) {
                 Swal.showValidationMessage(err.message);
@@ -42,7 +42,7 @@
 
         Swal.fire({
             icon: 'success',
-            title: 'Deleted',
+            title: 'Archived',
             text: result.value.message,
             timer: 1500,
             showConfirmButton: false

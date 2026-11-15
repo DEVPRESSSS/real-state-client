@@ -151,7 +151,6 @@
         </form>
     </div>
 
-    <partial name="_Pagination" model="Model" />
     <!-- Property Listings -->
     @if (Model != null && Model.Items.Any())
     {
@@ -197,6 +196,7 @@
         </div>
     }
 
+    <partial name="_Pagination" model="Model" />
 </div>
 
 @section Scripts {

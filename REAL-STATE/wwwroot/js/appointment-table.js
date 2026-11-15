@@ -205,6 +205,7 @@
         setText('modalScheduledAt', appointment.scheduledAt);
         setText('modalAgent', appointment.agent);
         setText('modalStatus', appointment.status);
+        setText('modalSource', appointment.source);
         setText('modalCreatedAt', appointment.createdAt);
         setText('modalNotes', appointment.notes || 'No additional notes provided.');
 
@@ -212,17 +213,13 @@
 
         approveBtn.classList.toggle('hidden', !isPending);
 
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.showModal();
 
         if (window.lucide) tableUtils.icons(el);
     }
 
     function closeAppointmentModal() {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-
-        selectedAppointmentId = null;
+        modal.close();
     }
 
     // Open modal
@@ -239,21 +236,22 @@
         openAppointmentModal(row.getData());
     });
 
+    modal.addEventListener('close', function () { selectedAppointmentId = null; });
+
     // Close modal
     closeModalBtn.addEventListener('click', closeAppointmentModal);
     cancelModalBtn.addEventListener('click', closeAppointmentModal);
 
     // Close when clicking outside the modal content
     modal.addEventListener('click', function (e) {
-        if (e.target === modal) {
-            closeAppointmentModal();
-        }
+        if (e.target === modal) closeAppointmentModal();
     });
 
     // Approve appointment
     approveBtn.addEventListener('click', async function () {
         if (!selectedAppointmentId) return;
 
+        const appointmentId = selectedAppointmentId;
         if (!confirm('Are you sure you want to approve this viewing request?')) {
             return;
         }
@@ -274,11 +272,11 @@
                     'RequestVerificationToken': token
                 },
                 body: new URLSearchParams({
-                    appointmentId: selectedAppointmentId
+                    appointmentId: appointmentId
                 })
             });
 
-            var result = await response.json();
+            var result = await response.json().catch(function () { return {}; });
 
             if (!response.ok || !result.success) {
                 throw new Error(result.message || 'Unable to approve appointment.');
@@ -287,13 +285,13 @@
             alert(result.message);
 
             // Update the current Tabulator row.
-            var row = table.getRow(selectedAppointmentId);
+            var row = table.getRow(appointmentId);
 
             if (row) {
                 await row.update({ status: 'Approved' });
             }
 
-            closeAppointmentModal();
+            if (modal.open && selectedAppointmentId === appointmentId) closeAppointmentModal();
 
         } catch (error) {
             alert(error.message || 'Something went wrong.');
@@ -306,68 +304,9 @@
             tableUtils.icons(approveBtn);
         }
     });
-    var fields = [
-        'property',
-        'contactName',
-        'email',
-        'phone',
-        'agent',
-        'scheduledAt',
-        'status',
-        'createdAt'
-    ];
-
-    var search = document.getElementById('appointmentSearch');
-    var count = document.getElementById('appointmentCount');
-
-    function updateCount() {
-        if (!count) return;
-
-        var n = table.getDataCount('active');
-
-        count.textContent = n + (n === 1
-            ? ' appointment on this page'
-            : ' appointments on this page');
-    }
-
-    if (search) {
-        search.addEventListener('input', tableUtils.debounce(function () {
-            var term = search.value.trim().toLowerCase();
-
-            if (!term) {
-                table.clearFilter();
-                return;
-            }
-
-            table.setFilter(function (row) {
-                return fields.some(function (field) {
-                    return String(row[field] || '')
-                        .toLowerCase()
-                        .indexOf(term) !== -1;
-                });
-            });
-        }, 200));
-    }
-
-    // View appointment event.
-    document.addEventListener('click', function (e) {
-        var button = e.target.closest('.appointment-view');
-
-        if (!button) return;
-
-        var appointmentId = button.dataset.id;
-
-        // Connect this event to your appointment details workflow.
-        document.dispatchEvent(new CustomEvent('appointment:view', {
-            detail: { id: appointmentId }
-        }));
-    });
-
     table.on('renderComplete', function () {
         if (window.lucide) tableUtils.icons(el);
     });
 
-    table.on('tableBuilt', updateCount);
-    table.on('dataFiltered', updateCount);
 
 })();

@@ -54,15 +54,18 @@
                 }
             },
             {
-                title: 'Actions', headerSort: false, hozAlign: 'right', minWidth: 190,
+                title: 'Actions', headerSort: false, hozAlign: 'right', minWidth: 255,
                 formatter: function (cell) {
                     var d = cell.getRow().getData();
-                    return '<div class="flex justify-end gap-2">' +
+                    var share = d.status === 'Available' && d.shareUrl
+                        ? '<a href="' + esc(d.shareUrl) + '" class="inline-flex items-center rounded border border-ice bg-white px-3 py-1.5 text-sm font-medium text-navy hover:bg-ice focus:outline-none focus-visible:ring-2 focus-visible:ring-azure">Share</a>'
+                        : '';
+                    return '<div class="flex justify-end gap-2">' + share +
                         '<a href="' + esc(d.editUrl) + '" class="inline-flex items-center gap-1 bg-azure px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">' +
                         '<i data-lucide="pencil" class="size-4" aria-hidden="true"></i>Edit</a>' +
-                        '<button type="button" class="js-delete inline-flex items-center gap-1 border border-red-700 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2" ' +
+                        (d.status === 'Archived' ? '' : '<button type="button" class="js-delete inline-flex items-center gap-1 border border-red-700 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2" ' +
                         'data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">' +
-                        '<i data-lucide="trash-2" class="size-4" aria-hidden="true"></i>Delete</button>' +
+                        '<i data-lucide="archive" class="size-4" aria-hidden="true"></i>Archive</button>') +
                         '</div>';
                 }
             }
@@ -95,6 +98,6 @@
     table.on('dataFiltered', updateCount);
 
     document.addEventListener('listing:deleted', function (e) {
-        table.deleteRow(e.detail.id).then(updateCount).catch(function () { });
+        Promise.resolve(table.getRow(e.detail.id)?.update({ status: 'Archived' })).then(updateCount).catch(function () { });
     });
 })();

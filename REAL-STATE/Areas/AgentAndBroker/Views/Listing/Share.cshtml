@@ -1,0 +1,35 @@
+@model REAL_STATE.Models.VM.PropertyShareVM
+@{
+    ViewData["Title"] = "Share property";
+}
+<section class="mx-auto max-w-2xl rounded-lg border border-ice bg-white p-6 shadow-sm">
+    <h1 class="text-3xl font-semibold text-navy">Share property</h1>
+    <p class="my-4 text-navy/60">Send this link to a potential buyer or tenant. Viewing requests made through it are marked as property referrals.</p>
+    <label for="propertyReferralLink" class="mb-2 block text-sm font-medium text-navy">@Model.Title</label>
+    <div class="flex flex-wrap gap-2">
+        <input id="propertyReferralLink" type="url" readonly value="@Model.Link"
+               class="min-w-0 flex-1 rounded border border-ice bg-snow px-3 py-2 text-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-azure" />
+        <button id="copyPropertyReferral" type="button" class="rounded bg-azure px-4 py-2 font-medium text-white hover:bg-azure-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">
+            Copy link
+        </button>
+    </div>
+    <p id="propertyReferralFeedback" class="mt-2 text-sm text-navy" role="status"></p>
+    <a asp-action="Index" class="mt-4 inline-flex text-azure hover:underline">Back to my listings</a>
+</section>
+
+@section Scripts {
+    <script>
+        document.getElementById('copyPropertyReferral').addEventListener('click', async function () {
+            const link = document.getElementById('propertyReferralLink');
+            const feedback = document.getElementById('propertyReferralFeedback');
+            try {
+                await navigator.clipboard.writeText(link.value);
+                feedback.textContent = 'Link copied.';
+            } catch {
+                link.focus();
+                link.select();
+                feedback.textContent = 'Link selected. Copy it to share.';
+            }
+        });
+    </script>
+}

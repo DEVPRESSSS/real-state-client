@@ -27,13 +27,13 @@ namespace REAL_STATE.Services.Interfaces
 
         Task<PagedResult<AppointmentListVM>> GetAppointmentsAsync(
            int page,
-           int pageSize
+           int pageSize, string? q = null
        );
 
         Task<PagedResult<AppointmentListVM>> GetAppointmentsForAgentAsync(
            int page,
            int pageSize,
-           string userId
+           string userId, string? q = null
        );
 
         Task<(bool Success, string Message)> ApproveAsync(string appointmentId, ClaimsPrincipal user);

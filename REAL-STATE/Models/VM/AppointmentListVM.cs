@@ -17,6 +17,7 @@
 
         public DateTime ScheduledAt { get; set; }
 
+        public bool IsPropertyReferral { get; set; }
         public string Status { get; set; } = string.Empty;
 
         public string? Notes { get; set; }

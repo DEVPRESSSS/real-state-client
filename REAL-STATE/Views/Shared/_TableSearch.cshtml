@@ -1,12 +1,17 @@
-<form method="get" class="my-4 flex items-center gap-3" role="search">
+@{
+    var defaultSize = ViewData["DefaultPageSize"] as int? ?? 20;
+    var pageSize = int.TryParse(Context.Request.Query["pageSize"], out var requestedSize) ? requestedSize : defaultSize;
+    const string field = "rounded border border-ice bg-white px-3 py-2 text-sm text-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-azure";
+}
+<form method="get" class="my-4 flex flex-wrap items-center gap-3 text-sm text-navy" role="search">
     <label for="serverSearch">Search all records</label>
-    <input id="serverSearch" name="q" type="search" maxlength="200" value="@Context.Request.Query["q"]" />
+    <input id="serverSearch" name="q" type="search" class="@field" maxlength="200" value="@Context.Request.Query["q"]" />
     <label for="pageSize">Rows per page</label>
-    <select id="pageSize" name="pageSize">
+    <select id="pageSize" name="pageSize" class="@field">
         @foreach (var size in new[] { 10, 20, 25, 50, 100 })
         {
-            <option value="@size" selected="@(Context.Request.Query["pageSize"].ToString() == size.ToString() || string.IsNullOrEmpty(Context.Request.Query["pageSize"]) && size == 20)">@size</option>
+            <option value="@size" selected="@(pageSize == size)">@size</option>
         }
     </select>
-    <button type="submit">Search</button>
+    <button type="submit" class="rounded bg-azure px-3 py-2 text-white hover:bg-azure-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">Search</button>
 </form>

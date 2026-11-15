@@ -7,6 +7,7 @@ using REAL_STATE.Models.VM;
 using REAL_STATE.Repositories.IRepositories;
 using REAL_STATE.Services.Interfaces;
 using System.Security.Claims;
+using REAL_STATE.Utilities;
 
 namespace REAL_STATE.Services
 {
@@ -15,14 +16,16 @@ namespace REAL_STATE.Services
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IPropertyRepository _propertyRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly PropertyReferralLinks _referrals;
 
         public AppointmentService(IAppointmentRepository appointmentRepository,
             UserManager<ApplicationUser> userManager,
-            IPropertyRepository propertyRepository)
+            IPropertyRepository propertyRepository, PropertyReferralLinks referrals)
         {
             _appointmentRepository = appointmentRepository;
             _userManager = userManager;
             _propertyRepository = propertyRepository;
+            _referrals = referrals;
         }
 
         public async Task<ScheduleAppointmentVM?> GetFormAsync(string propertyId, ClaimsPrincipal user)
@@ -78,7 +81,7 @@ namespace REAL_STATE.Services
             if (vm.PreferredDate.HasValue && vm.PreferredTime.HasValue)
             {
                 scheduledAt = vm.PreferredDate.Value.Date + vm.PreferredTime.Value.ToTimeSpan();
-                if (scheduledAt <= DateTime.Now)
+                if (scheduledAt <= ViewingTime.Now)
                 {
                     errors.Add((nameof(vm.PreferredDate), "Please choose a date and time in the future."));
                 }
@@ -97,6 +100,7 @@ namespace REAL_STATE.Services
             {
                 PropertyId = property.Id,
                 AgentId = property.AgentId,
+                ReferralAgentId = _referrals.GetReferringAgent(property, vm.ReferralToken),
                 UserId = user.Identity?.IsAuthenticated == true ? _userManager.GetUserId(user) : null,
                 ContactName = vm.ContactName.Trim(),
                 ContactEmail = vm.ContactEmail.Trim(),
@@ -120,7 +124,7 @@ namespace REAL_STATE.Services
 
         private async Task<Property?> LoadPropertyAsync(string propertyId) =>
 
-                        await _propertyRepository.GetAsync(x => x.Id == propertyId, includeProperties: "Images,Agent");
+                        await _propertyRepository.GetAsync(x => x.Id == propertyId && x.Status != "Archived", includeProperties: "Images,Agent");
 
 
         private static void FillPropertySummary(ScheduleAppointmentVM vm, Property p)
@@ -140,14 +144,14 @@ namespace REAL_STATE.Services
 
         public async Task<PagedResult<AppointmentListVM>> GetAppointmentsAsync(
             int page,
-            int pageSize)
+            int pageSize, string? q = null)
         {
             page = Math.Max(1, page);
             pageSize = Math.Clamp(pageSize, 10, 100);
 
             return await _appointmentRepository.GetPagedAsync(
                 page,
-                pageSize
+                pageSize, q
             );
         }
 
@@ -164,7 +168,7 @@ namespace REAL_STATE.Services
                 : (false, "The appointment is unavailable or has already been processed.");
         }
 
-        public async Task<PagedResult<AppointmentListVM>> GetAppointmentsForAgentAsync(int page, int pageSize, string userId)
+        public async Task<PagedResult<AppointmentListVM>> GetAppointmentsForAgentAsync(int page, int pageSize, string userId, string? q = null)
         {
             page = Math.Max(1, page);
             pageSize = Math.Clamp(pageSize, 10, 100);
@@ -172,7 +176,7 @@ namespace REAL_STATE.Services
             return await _appointmentRepository.GetPagedForAgentAsync(
                 page,
                 pageSize,
-                userId
+                userId, q
             );
         }
     }

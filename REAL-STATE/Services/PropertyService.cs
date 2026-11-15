@@ -43,6 +43,17 @@ namespace REAL_STATE.Services
             await _propertyRepository.Save();
         }
 
+        public async Task<bool> ArchiveAsync(string id, string? agentId = null)
+        {
+            var updatedAt = DateTime.UtcNow;
+            var changed = await _context.Properties
+                .Where(p => p.Id == id && (agentId == null || p.AgentId == agentId))
+                .ExecuteUpdateAsync(update => update
+                    .SetProperty(p => p.Status, "Archived")
+                    .SetProperty(p => p.UpdatedAt, updatedAt));
+            return changed == 1;
+        }
+
         private async Task ValidateReferencesAsync(PropertyInput input)
         {
             var errors = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
@@ -130,7 +141,7 @@ namespace REAL_STATE.Services
 
         public async Task<PropertyDetailsVM?> GetDetails(string id)
         {
-            var property = await _propertyRepository.GetAsync(x => x.Id == id,
+            var property = await _propertyRepository.GetAsync(x => x.Id == id && x.Status != "Archived",
                 includeProperties: "Developer,Agent,Images");
 
             if (property == null)

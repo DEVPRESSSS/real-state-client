@@ -10,6 +10,7 @@ namespace REAL_STATE.Services.Interfaces
         Task<PagedResult<FilterPropertyDTO>> Filter(CriteriaDTO criteriaDTO);
         Task AddProperty(PropertyVM vm);
         Task UpdateProperty(PropertyVM vm);
+        Task<bool> ArchiveAsync(string id, string? agentId = null);
         Task<PropertyDetailsVM?> GetDetails(string id);
 
     }

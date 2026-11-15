@@ -63,9 +63,9 @@
                     return '<div class="flex justify-end gap-2">' +
                         '<a href="' + esc(d.editUrl) + '" class="rounded-md inline-flex items-center gap-1 bg-azure px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-azure-dark active:bg-azure-darker focus:outline-none focus-visible:ring-2 focus-visible:ring-azure focus-visible:ring-offset-2">' +
                         '<i data-lucide="pencil" class="size-4" aria-hidden="true"></i>Edit</a>' +
-                        '<button type="button" class="rounded-md js-delete inline-flex items-center gap-1 border border-red-700 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2" ' +
+                        (d.status === 'Archived' ? '' : '<button type="button" class="rounded-md js-delete inline-flex items-center gap-1 border border-red-700 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2" ' +
                         'data-id="' + esc(d.id) + '" data-title="' + esc(d.title) + '">' +
-                        '<i data-lucide="trash-2" class="size-4" aria-hidden="true"></i>Delete</button>' +
+                        '<i data-lucide="archive" class="size-4" aria-hidden="true"></i>Archive</button>') +
                         '</div>';
                 }
             }
@@ -103,6 +103,6 @@
 
     // Listen for deletions announced by property.js
     document.addEventListener('property:deleted', function (e) {
-        table.deleteRow(e.detail.id).then(updateCount).catch(function () { });
+        Promise.resolve(table.getRow(e.detail.id)?.update({ status: 'Archived' })).then(updateCount).catch(function () { });
     });
 })();

@@ -322,6 +322,7 @@ namespace REAL_STATE.Data
                       .HasMaxLength(256);
 
                 entity.Property(v => v.ContactPhone).HasMaxLength(30);
+                entity.Property(v => v.ReferralAgentId).HasMaxLength(450);
                 entity.Property(v => v.Notes).HasMaxLength(1000);
 
                 entity.Property(v => v.Status)

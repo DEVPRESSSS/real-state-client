@@ -134,6 +134,43 @@ public sealed class SecurityAndQueryTests
     }
 
     [Fact]
+    public async Task Property_referrals_are_bound_to_the_listing_and_survive_archiving_in_request_history()
+    {
+        await using var test = new TestDatabase();
+        await test.InitializeAsync();
+        var (owner, other, property) = await test.SeedListingsAsync();
+        var properties = new PropertyRepository(test.Db);
+        var referrals = new PropertyReferralLinks(new EphemeralDataProtectionProvider());
+        var token = referrals.Create(property.Id, owner.Id);
+
+        Assert.Null(referrals.GetReferringAgent(property, "invalid-token"));
+        Assert.Null(referrals.GetReferringAgent(property, referrals.Create("another-property", owner.Id)));
+        Assert.Null(referrals.GetReferringAgent(property, referrals.Create(property.Id, other.Id)));
+
+        var appointments = new ViewingAppointmentRepository(test.Db);
+        var service = new AppointmentService(appointments, test.Users, properties, referrals);
+        var request = new ScheduleAppointmentVM
+        {
+            PropertyId = property.Id, ReferralToken = token,
+            PreferredDate = ViewingTime.Now.Date.AddDays(1), PreferredTime = new TimeOnly(10, 0),
+            ContactName = "Referral Client", ContactEmail = "referral@example.test"
+        };
+        var result = await service.CreateAsync(request, new ClaimsPrincipal(), true);
+        Assert.True(result.Success);
+        Assert.Equal(owner.Id, result.Appointment!.ReferralAgentId);
+
+        var listings = new PropertyService(test.Db, properties);
+        Assert.False(await listings.ArchiveAsync(property.Id, other.Id));
+        Assert.True(await listings.ArchiveAsync(property.Id, owner.Id));
+        Assert.Null(await listings.GetDetails(property.Id));
+        Assert.Null(await service.GetFormAsync(property.Id, new ClaimsPrincipal()));
+
+        var matches = await appointments.GetPagedForAgentAsync(1, 10, owner.UserId!, "referral@example.test");
+        Assert.True(Assert.Single(matches.Items).IsPropertyReferral);
+        Assert.Empty((await appointments.GetPagedForAgentAsync(1, 10, other.UserId!, "referral@example.test")).Items);
+    }
+
+    [Fact]
     public async Task Read_queries_do_not_track_entities_and_paging_bounds_extreme_input()
     {
         await using var test = new TestDatabase(); await test.InitializeAsync();

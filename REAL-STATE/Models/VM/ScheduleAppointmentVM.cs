@@ -6,6 +6,8 @@ namespace REAL_STATE.Models.VM
     {
         [Required]
         public string PropertyId { get; set; } = string.Empty;
+        [StringLength(512)]
+        public string? ReferralToken { get; set; }
         public string PropertyTitle { get; set; } = string.Empty;
         public string PropertyLocation { get; set; } = string.Empty;
         public decimal Price { get; set; }
@@ -38,7 +40,7 @@ namespace REAL_STATE.Models.VM
 
         [Required(ErrorMessage = "Please choose a preferred time.")]
         [DataType(DataType.Time)]
-        [Display(Name = "Preferred time")]
+        [Display(Name = "Preferred time (Philippine time)")]
         public TimeOnly? PreferredTime { get; set; }
 
         [StringLength(1000, ErrorMessage = "Notes can be up to 1,000 characters.")]
